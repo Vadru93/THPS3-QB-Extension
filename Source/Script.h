@@ -59,7 +59,7 @@ struct EXTERN CScript
 	BYTE* address;//address of where script - parser/executer is in script
 	CStruct* params;//params sent when called the script
 	void* extras;//extra stuff
-	BYTE unk[0x370];
+	BYTE unk[0x370];//bunch of zeros
 	//linked list
 	CScript* next;
 	CScript* prev;
@@ -102,6 +102,56 @@ struct EXTERN CScript
 		}
 		printf("\n");
 	}
+};
+//compressed map
+struct QBKeyInfo
+{
+	const enum QBKeyType
+	{
+		UNDEFINED = 0,
+		INT = 1,
+		FLOAT = 2,
+		STRING = 3,
+		LOCAL_STRING = 4,
+		PAIR = 5,
+		VECTOR = 6,
+		SCRIPTED_FUNCTION = 7,
+		COMPILED_FUNCTION = 8,
+		GLOBAL = 9,
+		STRUCT = 10,
+		LOCAL_STRUCT = 11,
+		ARRAY = 12,
+		LOCAL = 13,
+	};
+
+	QBKeyType type;
+	DWORD shiftedKey;
+	QBKeyInfo* next;
+	union
+	{
+		//This is the Value/Address of the QBKey ex:
+		//if Type is int this is the value of the int
+		//if Type is function this is the address of the function
+		//values:
+		union
+		{
+			float f;
+			int i;
+		} value;
+		//pointers:
+		char* pStr;
+		CScript* pScript;
+		D3DXVECTOR3* pVec;
+		bool(*pFunction)(CStruct*, CScript*);
+		CStructHeader** pStruct;
+	};
+};
+
+
+struct QBKeyInfoContainer
+{
+	QBKeyInfo* first;
+	QBKeyInfo* last;
 };
 
 
@@ -244,6 +294,8 @@ struct CStructHeader
 		//if Type is int this is the value of the int
 		//if Type is function this is the address of the function
 	};
+
+
 	inline float GetFloat()
 	{
 		return value.f;
@@ -298,6 +350,7 @@ struct CStructHeader
 	{
 		Type = QBKeyHeader::QBKeyType::UNDEFINED;
 		QBkey = 0;
+		Data = 0;
 		NextHeader = NULL;
 	}
 
@@ -501,6 +554,14 @@ struct EXTERN CStruct
 
 	void RemoveParam(DWORD name);
 
+	
+	//These are injected into game source and should not be called seperatly
+	//The compressed nodes are generated from the .q file upon loading of the [levelname].qb
+	//if the .q file exists and starts with 0xAA, it will try to generate the compressed nodes
+	BYTE* MaybeAddCompressed(DWORD qbKey, BYTE* pFile, QBKeyInfoContainer* other);
+	void AddCompressedNode(DWORD checksum, QBKeyInfoContainer* container);
+	
+
 	CStructHeader* AddParam(const char* name, QBKeyHeader::QBKeyType type);
 
 	typedef CStructHeader* (__thiscall* const mallocx)(CStruct* pThis);
@@ -526,6 +587,12 @@ struct EXTERN CStruct
 	bool inline AddParam(int name, QBKeyHeader::QBKeyType type, const void* data)
 	{
 		return addString(0x00428BF0)(this, name, type, data);
+	}
+
+	CStructHeader* AddCStruct(DWORD name, QBKeyHeader::QBKeyType type, DWORD data)
+	{
+		typedef CStructHeader* (__thiscall* pAddCStruct)(CStruct* pThis, int name, QBKeyHeader::QBKeyType type, DWORD data);
+		return pAddCStruct(0x00428C80)(this, name, type, data);
 	}
 
 	inline CStructHeader* AddChecksum(int ParamName, int Data, int qbType)
