@@ -137,7 +137,7 @@ public:
 		truelandedfromvert = value;
 	}
 
-	KeyState* GetKeyState(DWORD idx)
+	KeyState* GetKeyState(BYTE idx)
 	{
 		if (idx > 11)
 			idx = 11;

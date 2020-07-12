@@ -50,7 +50,7 @@ struct CompiledScript
 	const char* name;
 	bool(*pFunction)(CStruct*, CScript*);
 };
-
+struct Node;
 
 //pack(1) to make sure alignment is correct when try to acess game data
 #pragma pack(1)
@@ -66,7 +66,7 @@ struct EXTERN CScript
 	int nodeIndex;//-1 if no node
 	bool spawned;
 	BYTE unk3[3];
-	DWORD unkPTR;//Maybe CObject??
+	Node* node;
 	DWORD scriptChecksum;
 
 
@@ -274,7 +274,7 @@ struct CStructHeader
 {
 	QBKeyHeader::QBKeyType Type;
 	int QBkey;
-	union
+	const union
 	{
 		union
 		{
@@ -295,7 +295,7 @@ struct CStructHeader
 		//if Type is function this is the address of the function
 	};
 
-
+	
 	inline float GetFloat()
 	{
 		return value.f;
@@ -312,6 +312,46 @@ struct CStructHeader
 	{
 		return pScript;
 	}
+
+	CArray* GetArray(DWORD checksum)
+	{
+		if (this->QBkey == checksum)
+		{
+			printf("Array? %p %p\n", this, this->pArray);
+			return this->pArray;
+		}
+		CStructHeader* header = this->NextHeader;
+		while (header)
+		{
+			if (header->QBkey == checksum)
+			{
+				printf("Array? %p %p\n", header, header->pArray);
+				return header->pArray;
+			}
+			header = header->NextHeader;
+		}
+		return NULL;
+	}
+
+	D3DXVECTOR3* GetVector(DWORD checksum)
+	{
+		if (QBkey == checksum)
+		{
+			return pVec;
+		}
+
+		CStructHeader* pThis = NextHeader;
+		while (pThis)
+		{
+			if (pThis->QBkey == checksum)
+			{
+				return pThis->pVec;
+			}
+			pThis = pThis->NextHeader;
+		}
+		return NULL;
+	}
+
 	bool GetStruct(DWORD checksum, CStructHeader** header)
 	{
 		if (QBkey == checksum)
@@ -328,6 +368,7 @@ struct CStructHeader
 				*header = pThis;
 				return true;
 			}
+			pThis = pThis->NextHeader;
 		}
 
 		return false;
@@ -427,14 +468,34 @@ struct CStructHeader
 	}
 };
 
+struct NodeContainer
+{
+	int index;
+	D3DXVECTOR3 pos;
+};
 
 //CArray
 struct EXTERN CArray
 {
-	CStructHeader** Items;
+	union
+	{
+		CStructHeader** Items;
+		NodeContainer* container;
+	};
 	WORD Type;
 	WORD NumItems;
 
+	int & operator[] (int x) {
+		if (Type != 1)
+		{
+			printf("Unsupported ArrayType\n");
+			return x;
+		}
+		if (x > NumItems)
+			printf("###TOOO HIGH INDEX IN CARRAY!!!###\n");
+		x &= NumItems;
+		return container->index;
+	}
 
 	int GetNumItems();
 	void SetValues(CStructHeader* values);
@@ -529,6 +590,15 @@ struct EXTERN CArray
 	inline CStructHeader* GetCStruct(char* Name, int Item, int* outItem)
 	{
 		return GetCStruct(Checksum(Name), Item, outItem);
+	}
+
+	CStructHeader* GetNodeStruct(DWORD index)
+	{
+		if (index > 0xFFFF)
+			printf("###WARNING INDEX TOO HIGH###\n");
+		index &= 0xFFFF;
+		printf("Index %d %p", index, Items[index]);
+		return *(CStructHeader**)Items[index];
 	}
 
 	bool AddString(char* String);
@@ -738,7 +808,7 @@ struct EXTERN CStruct
 	}
 
 
-	bool GetVector(int checksum, D3DXVECTOR3* dest)
+	bool GetVector(int checksum, D3DXVECTOR3** dest)
 	{
 		bool rett;
 		static const DWORD pGetVector = 0x00429970;
@@ -842,7 +912,7 @@ struct EXTERN CStruct
 		_asm push script
 		_asm mov ecx, this;
 		_asm call pGetScript
-		_asm mov rett, al;
+		_asm mov rett, al; 0049D0B3
 		return rett;
 	}
 
@@ -895,6 +965,11 @@ struct EXTERN CStruct
 	bool GetStruct(DWORD checksum, CStructHeader** header)
 	{
 		return head->GetStruct(checksum, header);
+	}
+
+	D3DXVECTOR3* GetVector(const char* param)
+	{
+		return head->GetVector(Checksum(param));
 	}
 	//EOF My Functions
 };
