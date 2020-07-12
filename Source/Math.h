@@ -10,3 +10,18 @@ void OrthoNormalizeAbout(D3DXMATRIX* matrix, DWORD axis)
 
 	pOrthoNormalizeAbout(0x0040F0E0)(matrix, axis);
 }
+
+
+D3DXVECTOR3& Transform(D3DXVECTOR3& V, D3DXMATRIX& M)
+{
+	float x = V.x * M._11 + V.y * M._21 + V.z * M._31 + M._41;
+	float y = V.x * M._12 + V.y * M._22 + V.z * M._32 + M._42;
+	float z = V.x * M._13 + V.y * M._23 + V.z * M._33 + M._43;
+	float w = V.x * M._14 + V.y * M._24 + V.z * M._34 + M._44;
+	D3DXVECTOR3 Out;
+	Out.x = x / w;
+	Out.y = y / w;
+	Out.z = z / w;
+	return Out;
+}
+
