@@ -69,6 +69,11 @@ struct EXTERN CScript
 	Node* node;
 	DWORD scriptChecksum;
 
+	CScript()
+	{
+		ZeroMemory(this, sizeof(CScript));
+	}
+
 
 
 	static CScript* GetNextScript(CScript* pScript = NULL)
@@ -102,6 +107,9 @@ struct EXTERN CScript
 		}
 		printf("\n");
 	}
+
+	DWORD GetNodeName();
+	
 };
 //compressed map
 struct QBKeyInfo

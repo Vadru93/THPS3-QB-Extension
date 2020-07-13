@@ -17,7 +17,7 @@ bool EXTERN InvalidReadPtr(const void* const __restrict ptr);
 
 enum enum_matrix
 {
-	RIGHT,
+	RIGHT=0,
 	UP,
 	AT,
 	POS,
@@ -25,7 +25,7 @@ enum enum_matrix
 
 enum enum_vertex
 {
-	X,
+	X=0,
 	Y,
 	Z,
 	W

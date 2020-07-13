@@ -156,5 +156,7 @@ namespace Checksums
         Relpos = COMPILE_CRC32("relpos"),
         Normal_Lerp_Speed = COMPILE_CRC32("Normal_Lerp_Speed"),
         OnServer = COMPILE_CRC32("OnServer"),
+        ANGULAR_VELOCITY = COMPILE_CRC32("ANGULAR_VELOCITY"),
+        MOVE_TO_POS =  COMPILE_CRC32("MOVE_TO_POS"),
     };
 };
