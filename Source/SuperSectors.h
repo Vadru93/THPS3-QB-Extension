@@ -89,24 +89,7 @@ EXTERN struct SuperSector
 		pSetMeshState(0x00418DD0)(Node::GetNodeIndex(name), state, &pScript);
 	}
 };
-//Check if pos changed
-				D3DXVECTOR3 newPos = (sector->bboxMax + sector->bboxMin) / 2.0f;
-				if (newPos != pos)
-				{
-					//Why does the pos change???
-					printf("newPos %f %f %f pos %f %f %f\n", newPos.x, newPos.y, newPos.z, pos.x, pos.y, pos.z);
-					newPos = pos - newPos;
-					sector->bboxMax += newPos;
-					sector->bboxMin += newPos;
-					for (DWORD i = 0; i < sector->numVertices; i++)
-					{
-						sector->vertices[i] += newPos;
-					}
-					newPos = (sector->bboxMax + sector->bboxMin) / 2.0f;
-				}
-				if (newPos != pos)//Even now the pos is changed, rounding errors or my math is wrong?????
-					printf("AGAIN newPos %f %f %f pos %f %f %f\n", newPos.x, newPos.y, newPos.z, pos.x, pos.y, pos.z);
-				pos = newPos;
+
 struct MovingObject
 {
 	enum Types
@@ -130,6 +113,8 @@ struct MovingObject
 	D3DXVECTOR3 bboxMax;
 	D3DXVECTOR3 bboxMin;
 	D3DXVECTOR3* vertices;
+	D3DXMATRIX orient;
+	D3DXMATRIX position;
 
 
 	MovingObject(SuperSector* _sector, D3DXVECTOR3 & _goal, CScript* _pScript)
@@ -189,11 +174,11 @@ struct MovingObject
 		this->link = Node::GetNodeStruct(checksum);
 		if (!this->link)
 			MessageBox(0, "", "", 0);
-		CStructHeader* position;
-		if (!this->link->GetStruct(Checksums::Position, &position))
+		CStructHeader* _position;
+		if (!this->link->GetStruct(Checksums::Position, &_position))
 			pos = D3DXVECTOR3(0, 0, 0);
 		else
-			pos = *position->pVec;
+			pos = *_position->pVec;
 
 
 		angle = _angle;
@@ -201,6 +186,7 @@ struct MovingObject
 
 		bboxMax = D3DXVECTOR3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		bboxMin = D3DXVECTOR3(FLT_MAX, FLT_MAX, FLT_MAX);
+		vertices = new D3DXVECTOR3[sector->numVertices];
 
 		for (DWORD i = 0; i < sector->numVertices; i++)
 		{
@@ -218,11 +204,16 @@ struct MovingObject
 				bboxMax.z = sector->vertices[i].z;
 			if (sector->vertices[i].z < bboxMin.z)
 				bboxMin.z = sector->vertices[i].z;
+			vertices[i] = sector->vertices[i] - pos;
 		}
 		sector->bboxMax = bboxMax;
 		sector->bboxMin = bboxMin;
+		bboxMax -= pos;
+		bboxMin -= pos;
 		pos = (sector->bboxMax + sector->bboxMin) / 2.0f;
-		vertices = NULL;
+		D3DXMatrixTranslation(&position, pos.x, pos.y, pos.z);
+		D3DXMatrixIdentity(&orient);
+		//vertices = NULL;
 	}
 
 	MovingObject(SuperSector* _sector, D3DXVECTOR3 & _goal, CScript* _pScript, CStructHeader* _node)
@@ -435,8 +426,8 @@ struct MovingObject
 			{
 				//same matrix function I use in Level Editor
 				D3DXMatrixRotationYawPitchRoll(&nodeRotation, -angle.y, angle.x, angle.z);
-				D3DXMatrixTranslation(&nodeTranslation, pos.x, pos.y, pos.z);
-				D3DXMatrixMultiply(&world, &nodeRotation, &nodeTranslation);
+				D3DXMatrixMultiply(&orient, &orient, &nodeRotation);
+				D3DXMatrixMultiply(&world, &orient, &position);
 
 				//make a new bbox in a temp location so we can keep the actual bbox
 				bboxMax = D3DXVECTOR3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -448,10 +439,8 @@ struct MovingObject
 
 				for (DWORD i = 0; i < sector->numVertices; i++)
 				{
-					//Move the object to origin and then transform it by the matrix and move it back to the position
-					sector->vertices[i] -= pos;
-					sector->vertices[i] = Transform(sector->vertices[i], world);
-					//sector->vertices[i] += pos;
+					//Use the vertices that's translated to origin and transform them with the rotation*position matrix
+					sector->vertices[i] = Transform(vertices[i], world);
 
 					//calculate the new bbox into the temp location
 					if (bboxMax.x < sector->vertices[i].x)
