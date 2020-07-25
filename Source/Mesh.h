@@ -1,4 +1,6 @@
 #pragma once
+#ifndef MESH_H
+#define MESH_H
 #include "Defines.h"
 
 struct SuperSector;
@@ -21,12 +23,13 @@ struct Mesh
 	WORD numUnk;
 	WORD numUnk1;
 	WORD padding;
-	DWORD pNull;
+	DWORD* pNull;
 	WORD* indices;
 
 
 	void Update()
 	{
+		_printf("Updating VertexBuffer\n");
 		state |= 0x200;
     }
 };
@@ -40,3 +43,4 @@ struct Object
 	DWORD* Obj;//SuperSector+0x1C
 	DWORD pMemberFunction;
 };
+#endif

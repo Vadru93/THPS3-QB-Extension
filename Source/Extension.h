@@ -1,4 +1,6 @@
 #pragma once
+#ifndef EXTENSION_H
+#define EXTENSION_H
 #include "Skater.h"
 #include "Memory.h"
 
@@ -12,8 +14,8 @@ DWORD EXTERN GetTagCount();
 void EXTERN SendChatMsg(char* text);
 
 //Use this to be able draw your own things in present hook.
-typedef HRESULT(__stdcall* Hooked_Present)(LPDIRECT3DDEVICE8 pDevice, CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion);
-EXTERN Hooked_Present pHookedPresent;
+/*typedef HRESULT(__stdcall* Hooked_Present)(LPDIRECT3DDEVICE8 pDevice, CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion);
+EXTERN Hooked_Present pHookedPresent;*/
 
 
 
@@ -77,11 +79,13 @@ static const pCastPointer CastPointer = (pCastPointer)(0x00577E58);
 DWORD GetElementSliderValue(DWORD name)
 {
 	_asm pushad;
+	_asm pushfd;
 	Element* container = AllocateElement(0);
 	Element* element = container->GetElement(name);
 	element = (Element*)CastPointer((void*)element, 0, 0x005B6344, 0x005B6638, FALSE);
 	DWORD value = element->GetValue();
 	FreeElement();
+	_asm popfd;
 	_asm popad;
 	return value;
 }
@@ -93,8 +97,9 @@ bool GetSliderValue(CStruct* pStruct, CScript* pScript)
 {
 	int name = 0;
 	pStruct->GetScript("id", &name);
-	int paramName = 0;
-	if (pStruct->GetScript("name", &paramName))
+	int paramName = -255;
+	pStruct->GetScript("name", &paramName);
+    if(paramName!=-255)
 	{
 		CStructHeader* param = NULL;
 
@@ -117,9 +122,10 @@ bool GetSliderValue(CStruct* pStruct, CScript* pScript)
 //Change the values of a struct, check optionsmenu.qb
 bool ChangeValues(CStruct* pStruct, CScript* pScript)
 {
-	int container = 0;
+	int container = -255;
 
-	if (pStruct->GetScript("Container", &container))
+	pStruct->GetScript("Container", &container);
+	if(container!=-255)
 	{
 		QBKeyHeader* pContainer = GetQBKeyHeader(container);
 		if (pContainer)
@@ -151,3 +157,4 @@ bool Modulating()
 	}
 	return false;
 }
+#endif

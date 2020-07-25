@@ -1,8 +1,16 @@
 #pragma once
+#ifndef DEFINES_H
+#define DEFINES_H
+#include <winsock2.h>
 #include "windows.h"
 #include "vector"
-#include <d3dx8.h>
-#include <d3dx8core.h>
+#include <stdio.h>
+#include <math.h>
+#include <errno.h>
+#include <fenv.h>
+#include <string.h>
+#include <d3dx9.h>
+#include <d3dx9core.h>
 #include <map>
 
 #ifdef EXPORTING
@@ -52,3 +60,17 @@ if (InvalidReadPtr(p, s)) \
   _T(" is not a valid read area\r\n"), __FUNCTION__, 0); return NULL; \
 } \
 }
+
+void _printf(const char* str, ...)
+{
+//#if 1
+	va_list va_alist;
+	va_start(va_alist, str);
+	char logbuf[512] = { 0 };
+	_vsnprintf(logbuf + strlen(logbuf), sizeof(logbuf) - strlen(logbuf), str, va_alist);
+	va_end(va_alist);
+	printf(logbuf);
+	//printf(str, ...);
+//#endif
+}
+#endif

@@ -1,4 +1,6 @@
 #pragma once
+#ifndef MEMORY_H
+#define MEMORY_H
 #include "Defines.h"
 #include "Script.h"
 
@@ -37,3 +39,4 @@ void* __restrict mallocx(const DWORD buflen)
 	_asm mov allocated, eax
 	return allocated;
 }
+#endif

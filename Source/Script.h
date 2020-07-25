@@ -1,13 +1,16 @@
 #pragma once
+#ifndef SCRIPT_H
+#define SCRIPT_H
 #include "Defines.h"
 #include "Checksum.h"
+#include "source/QBKey.h"
 
 
 struct CStruct;
 struct CStructHeader;
 struct CArray;
 struct CScript;
-struct QBKeyHeader;
+//struct QBKeyHeader;
 
 
 EXTERN struct Script;
@@ -17,10 +20,10 @@ void EXTERN SetStructValues(CStructHeader* pStruct, CStructHeader* values);
 void EXTERN SetArrayValues(CArray* pArray, CStructHeader* values);
 
 //calls a QB scripted function, remember to pass a CStruct.
-typedef void(__cdecl* const ExecuteScript)(const char* __restrict name, const CStruct* __restrict pParams, const CScript* __restrict pScript, const void* unk);
-__declspec(noalias) void inline ExecuteQBScript(const char* __restrict pScriptName, const CStruct* __restrict pParams, const CScript* __restrict pScript = NULL, const void* __restrict unk = NULL)
+typedef void(__cdecl* const ExecuteScript)(const char* __restrict name, const CStruct* __restrict pParams, const CScript* __restrict pScript);
+__declspec(noalias) void inline ExecuteQBScript(const char* __restrict pScriptName, const CStruct* __restrict pParams, const CScript* __restrict pScript = NULL)
 {
-	return ExecuteScript(0x00428240)(pScriptName, pParams, pScript, unk);
+	return ExecuteScript(0x00428240)(pScriptName, pParams, pScript);
 }
 
 //Add a QBkeyHeader to game array, this can be a value/function that you can acces/call in qb script.
@@ -53,7 +56,7 @@ struct CompiledScript
 struct Node;
 
 //pack(1) to make sure alignment is correct when try to acess game data
-#pragma pack(1)
+//#pragma pack(1)
 struct EXTERN CScript
 {
 	BYTE* address;//address of where script - parser/executer is in script
@@ -93,19 +96,19 @@ struct EXTERN CScript
 
 	static void DumpScripts()
 	{
-		printf("###########################################################\n\n");
-		printf("All the CScripts that currently exist ...\n\n");
+		_printf("###########################################################\n\n");
+		_printf("All the CScripts that currently exist ...\n\n");
 
 		CScript* p_scr = GetNextScript();
 
 		while (p_scr)
 		{
-			printf("CScript %s %X\n", FindChecksumName(p_scr->scriptChecksum), p_scr);
+			_printf("CScript %s %X\n", FindChecksumName(p_scr->scriptChecksum), p_scr);
 
 			p_scr = GetNextScript(p_scr);
 
 		}
-		printf("\n");
+		_printf("\n");
 	}
 
 	DWORD GetNodeName();
@@ -163,93 +166,6 @@ struct QBKeyInfoContainer
 };
 
 
-struct QBKeyHeader//Used to store information about QBKeys (Type, Value/Address)
-{
-	const enum QBKeyType
-	{
-		UNDEFINED = 0,
-		INT = 1,
-		FLOAT = 2,
-		STRING = 3,
-		LOCAL_STRING = 4,
-		PAIR = 5,
-		VECTOR = 6,
-		SCRIPTED_FUNCTION = 7,
-		COMPILED_FUNCTION = 8,
-		GLOBAL = 9,
-		STRUCT = 10,
-		LOCAL_STRUCT = 11,
-		ARRAY = 12,
-		LOCAL = 13,
-	};
-
-	int QBKeyCheck;//First 20 bit of the QBKey
-	//Types:
-	//0x0 - Undefined - End of array / struct and used when parsing / calling scripts
-	//0x1 - Int
-	//0x2 - Float
-	//0x3 - String
-	//0x4 - Local String - Used in struct/array	
-	//0x5 - Pair
-	//0x6 - Vector
-	//0x7 - Scripted Function
-	//0x8 - Compiled Function
-	//0x9 - Global Variable/Function - Member Function in Thps4
-	//0xA - Struct
-	//0xB - Local Struct - Used in struct/array Structure Pointer in Thps4
-	//0xC - Array
-	//0xD - Local Variable/Function - Used in struct/array Name in Thps4
-	QBKeyType type;
-	int id;//Always 0x2?
-	union
-	{
-		//This is the Value/Address of the QBKey ex:
-		//if Type is int this is the value of the int
-		//if Type is function this is the address of the function
-		//values:
-		union
-		{
-			float f;
-			int i;
-		} value;
-		//pointers:
-		char* pStr;
-		CScript* pScript;
-		D3DXVECTOR3* pVec;
-		bool(*pFunction)(CStruct*, CScript*);
-		CStructHeader** pStruct;
-	};
-	inline float GetFloat()
-	{
-		return value.f;
-	}
-	inline int GetInt()
-	{
-		return value.i;
-	}
-	inline char* GetString()
-	{
-		return pStr;
-	}
-	inline CScript* GetScript()
-	{
-		return pScript;
-	}
-	inline bool CallScript(CStruct* pStruct, CScript* pScript)
-	{
-		return pFunction(pStruct, pScript);
-	}
-	void SetValues(CStructHeader* values)
-	{
-		switch (type)
-		{
-		case STRUCT:
-		case LOCAL_STRUCT:
-			SetStructValues(*pStruct, values);
-		}
-	}
-};
-
 
 //Get information about a QBKey, first it will try with dll function and then ingame function. If no information is found it will return NULL
 EXTERN QBKeyHeader* GetQBKeyHeader(unsigned long QBKey);
@@ -304,6 +220,14 @@ struct CStructHeader
 	};
 
 	
+	CStructHeader(QBKeyHeader::QBKeyType Type, DWORD checksum, void* data)
+	{
+		this->Type = Type;
+		this->QBkey = checksum;
+		this->pData = data;
+		NextHeader = NULL;
+	}
+
 	inline float GetFloat()
 	{
 		return value.f;
@@ -325,7 +249,7 @@ struct CStructHeader
 	{
 		if (this->QBkey == checksum)
 		{
-			printf("Array? %p %p\n", this, this->pArray);
+			_printf("Array? %p %p\n", this, this->pArray);
 			return this->pArray;
 		}
 		CStructHeader* header = this->NextHeader;
@@ -333,7 +257,7 @@ struct CStructHeader
 		{
 			if (header->QBkey == checksum)
 			{
-				printf("Array? %p %p\n", header, header->pArray);
+				_printf("Array? %p %p\n", header, header->pArray);
 				return header->pArray;
 			}
 			header = header->NextHeader;
@@ -349,7 +273,7 @@ struct CStructHeader
 		}
 
 		CStructHeader* pThis = NextHeader;
-		while (pThis)
+		while (pThis && !InvalidReadPtr(pThis) && !InvalidReadPtr(pThis, sizeof(CStructHeader)))
 		{
 			if (pThis->QBkey == checksum)
 			{
@@ -369,7 +293,7 @@ struct CStructHeader
 		}
 
 		CStructHeader* pThis = NextHeader;
-		while (pThis)
+		while (pThis && !InvalidReadPtr(pThis) && !InvalidReadPtr(pThis, sizeof(CStructHeader)))
 		{
 			if (pThis->QBkey == checksum)
 			{
@@ -403,19 +327,19 @@ struct CStructHeader
 		NextHeader = NULL;
 	}
 
-	CStructHeader(QBKeyHeader::QBKeyType type, int QBKey, float value, CStructHeader* next)
+	CStructHeader(QBKeyHeader::QBKeyType type, int _QBKey, float _value, CStructHeader* next)
 	{
 		Type = type;
-		this->QBkey = QBKey;
-		this->value.f = value;
+		this->QBkey = _QBKey;
+		this->value.f = _value;
 		NextHeader = next;
 	}
 
-	CStructHeader(QBKeyHeader::QBKeyType type, int QBKey, char* pStr, CStructHeader* next)
+	CStructHeader(QBKeyHeader::QBKeyType type, int _QBKey, char* _pStr, CStructHeader* next)
 	{
 		Type = type;
-		this->QBkey = QBKey;
-		this->pStr = pStr;
+		this->QBkey = _QBKey;
+		this->pStr = _pStr;
 		NextHeader = next;
 	}
 
@@ -480,140 +404,6 @@ struct NodeContainer
 {
 	int index;
 	D3DXVECTOR3 pos;
-};
-
-//CArray
-struct EXTERN CArray
-{
-	union
-	{
-		CStructHeader** Items;
-		NodeContainer* container;
-	};
-	WORD Type;
-	WORD NumItems;
-
-	int & operator[] (int x) {
-		if (Type != 1)
-		{
-			printf("Unsupported ArrayType\n");
-			return x;
-		}
-		if (x > NumItems)
-			printf("###TOOO HIGH INDEX IN CARRAY!!!###\n");
-		x &= NumItems;
-		return container->index;
-	}
-
-	int GetNumItems();
-	void SetValues(CStructHeader* values);
-	inline float GetFloat(int Item)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-		{
-			return *(float*)&((CStructHeader***)Items)[Item][0]->Data;
-		}
-		return ((float*)Items)[Item];
-	}
-
-	inline float GetFloat(int Item, int Itm)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-		{
-			return *(float*)((CStructHeader***)Items)[Item][Itm]->Data;
-		}
-		else return 0.0;
-	}
-
-	inline int GetInt(int Item)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return ((CStructHeader***)Items)[Item][0]->Data;
-		return ((int*)Items)[Item];
-	}
-
-	inline int GetInt(int Item, int Itm)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return ((CStructHeader***)Items)[Item][Itm]->Data;
-		else return 0;
-	}
-
-	inline char* GetString(int Item)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return (char*)((CStructHeader***)Items)[Item][0]->pData;
-		return ((char**)Items)[Item];
-	}
-
-	inline char* GetString(int Item, int Itm)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return (char*)((CStructHeader***)Items)[Item][Itm]->pData;
-		return 0;
-	}
-
-	inline D3DXVECTOR3* GetVector(int Item)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return (D3DXVECTOR3*)((CStructHeader***)Items)[Item][0]->pData;
-		return ((D3DXVECTOR3**)Items)[Item];
-	}
-
-	inline D3DXVECTOR3* GetVector(int Item, int Itm)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return (D3DXVECTOR3*)((CStructHeader***)Items)[Item][Itm]->pData;
-		return 0;
-	}
-
-	inline void* GetPair(int Item)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return (void*)((CStructHeader***)Items)[Item][0]->pData;
-		return ((void**)Items)[Item];
-	}
-
-	inline void* GetPair(int Item, int Itm)
-	{
-		if (Type == 0x0A || Type == 0x0B)
-			return (void*)((CStructHeader***)Items)[Item][Itm]->pData;
-		return 0;
-	}
-
-	inline CStructHeader** GetCStructs(int Item)
-	{
-		return ((CStructHeader***)Items)[Item];
-	}
-
-	CStructHeader* GetCStruct(int Name, int Item, int Struct);
-
-	inline CStructHeader* GetCStruct(char* Name, int Item, int Struct)
-	{
-		return GetCStruct(Checksum(Name), Item, Struct);
-	}
-
-	CStructHeader* GetCStruct(int Name, int Item, int* outItem);
-
-	inline CStructHeader* GetCStruct(char* Name, int Item, int* outItem)
-	{
-		return GetCStruct(Checksum(Name), Item, outItem);
-	}
-
-	CStructHeader* GetNodeStruct(DWORD index)
-	{
-		if (index > 0xFFFF)
-			printf("###WARNING INDEX TOO HIGH###\n");
-		index &= 0xFFFF;
-		printf("Index %d %p", index, Items[index]);
-		return *(CStructHeader**)Items[index];
-	}
-
-	bool AddString(char* String);
-
-	bool AddCStruct(CStruct* Struct);
-
-	void Free();
 };
 
 
@@ -911,6 +701,19 @@ struct EXTERN CStruct
 		return rett;
 	}
 
+	/*inline bool GetScript(char* name, const char** dest)
+	{
+		bool rett;
+		static const DWORD pGetScript = 0x00429DC0;
+		_asm push 1
+		_asm push dest
+		_asm push name
+		_asm mov ecx, this;
+		_asm call pGetScript
+		_asm mov rett, al;
+		return rett;
+	}*/
+
 	inline bool GetScript(const char* script, const char** dest)
 	{
 		bool rett;
@@ -966,13 +769,40 @@ struct EXTERN CStruct
 
 
 	//My Functions
+
+	void AddParam(CStructHeader* pParam)
+	{
+		head = pParam;
+		tail = pParam;
+	}
+
 	void FreeHeader();
 
 	void Free();
 
 	bool GetStruct(DWORD checksum, CStructHeader** header)
 	{
-		return head->GetStruct(checksum, header);
+		CStructHeader* pThis = head;
+		while (pThis && pThis != tail)
+		{
+			if (pThis->QBkey == checksum)
+			{
+				*header = pThis;
+				return true;
+			}
+			if (pThis->NextHeader)
+				pThis = pThis->NextHeader;
+			else
+				pThis++;
+			
+		}
+		if (pThis && pThis->QBkey == checksum)
+		{
+			*header = pThis;
+			return true;
+		}
+		return false;
+		//return head->GetStruct(checksum, header);
 	}
 
 	D3DXVECTOR3* GetVector(const char* param)
@@ -981,3 +811,5 @@ struct EXTERN CStruct
 	}
 	//EOF My Functions
 };
+//#pragma pop(pack)
+#endif

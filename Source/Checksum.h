@@ -1,4 +1,6 @@
 #pragma once
+#ifndef CHECKSUM_H
+#define CHECKSUM_H
 #include "Defines.h"
 
 EXTERN char* FindChecksumName(DWORD checksum);
@@ -93,7 +95,7 @@ unsigned long crc32f(unsigned char* buf)
         if (c >= 'A' && c <= 'Z') c += 32;
         if (c == '/') c = '\\';
 
-        crc = checksumTable[(unsigned char)(crc ^ c)] ^ (crc >> 8);
+        crc = checksumTable[(unsigned char)((crc ^ c) & 0xFF)] ^ (crc >> 8);
         c = *buf++;
     }
     return crc;
@@ -157,6 +159,11 @@ namespace Checksums
         Normal_Lerp_Speed = COMPILE_CRC32("Normal_Lerp_Speed"),
         OnServer = COMPILE_CRC32("OnServer"),
         ANGULAR_VELOCITY = COMPILE_CRC32("ANGULAR_VELOCITY"),
-        MOVE_TO_POS =  COMPILE_CRC32("MOVE_TO_POS"),
+        MOVE_TO_POS = COMPILE_CRC32("MOVE_TO_POS"),
+        ORIENT = COMPILE_CRC32("ORIENT"),
+        FUNCTION = COMPILE_CRC32("Function"),
+        param = COMPILE_CRC32("param"),
+        text = COMPILE_CRC32("text"),
     };
 };
+#endif

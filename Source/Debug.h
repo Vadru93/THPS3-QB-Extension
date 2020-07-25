@@ -1,6 +1,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
-
+#include <winsock2.h>
 #include "windows.h"
 #include <stdio.h>
 #include "Psapi.h"

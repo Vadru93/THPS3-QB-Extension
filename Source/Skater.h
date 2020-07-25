@@ -1,5 +1,7 @@
 #pragma once
-#include "Math.h"
+#ifndef SKATER_H
+#define SKATER_H
+#include "_Math.h"
 #include "KeyState.h"
 #include "Script.h"
 
@@ -46,37 +48,38 @@ struct SkaterProfileContainer
 	}
 };
 
+//#pragma pack(1)
 //Skater: contains information about camera, position, collision etc
-EXTERN struct Skater
+EXTERN struct Skater//GetSkaterInfo 004769D0
 {
 private://0575a190
 	DWORD memberFunctions;
-	byte unk1[0x14];
+	BYTE unk1[0x14];
 	D3DXVECTOR3 position;
 	float positionW;//1.0f
 	D3DXVECTOR3 oldpos;
 	float oldposW;//1.0f
-	byte unk4[0x2FC];
+	BYTE unk4[0x2FC];
 	D3DXVECTOR3 velocity;
-	byte unk5[0x14];
+	BYTE unk5[0x14];
 	D3DXMATRIX matrix;
-	byte unknown5[0x3F];
+	BYTE unknown5[0x3F];
 	bool landedfromvert;
 	bool truelandedfromvert;
-	byte unknown4[0x7F4B];
+	BYTE unknown4[0x7F4B];
 	bool inVert;
-	byte unknown6[0xF];
+	BYTE unknown6[0xF];
 	bool tracking;
-	byte unknown7[0x1F];
+	BYTE unknown7[0x1F];
 	bool canbreakvert;
-	byte unknown8[0x4F];//1 more
+	BYTE unknown8[0x4F];//1 more
 	bool autoturn;
-	byte unknown[0x57];//1 more
+	BYTE unknown[0x57];//1 more
 	D3DXMATRIX  old;
 	D3DXMATRIX  lerp;//1 more
-	byte unknown2[0x58];
+	BYTE unknown2[0x58];
 	KeyState keystates[12];
-	byte unknown3[0x3C];
+	BYTE unknown3[0x3C];
 	D3DXVECTOR3 startcol;
 	float startcolW;//1.0f
 	D3DXVECTOR3 endcol;
@@ -86,7 +89,7 @@ private://0575a190
 	float unk;//some normal??
 	D3DXVECTOR3 normal;
 	D3DXVECTOR3 hitpoint;
-	byte unk3[0x134];
+	BYTE unk3[0x134];
 	D3DXVECTOR4 displaynormal;
 	D3DXVECTOR4 currentnormal;
 	D3DXVECTOR4 lastdisplaynormal;
@@ -96,8 +99,20 @@ private://0575a190
 	float un2;
 	float normallerp;
 
-#pragma pop(pack)
+//#pragma pop(pack)
 public:
+
+	static DWORD GetCamModeAddress()
+	{
+		DWORD ptr = *(DWORD*)0x00930BB0;
+		ptr = *(DWORD*)ptr;
+		return ptr + 0x882C;
+	}
+
+	D3DXVECTOR4* GetCurrentNormal()
+	{
+		return &currentnormal;
+	}
 
 	typedef void(__thiscall* const pSetNormal)(Skater* pThis, D3DXVECTOR4& normal);
 	void SetNormal(D3DXVECTOR4& normal)
@@ -107,7 +122,7 @@ public:
 		displaynormal = *(D3DXVECTOR4*)pMatrix->m[Y];
 		currentnormal = normal;
 		lastdisplaynormal = displaynormal;
-		normallerp = 1.0f;
+		normallerp = 0.1f;
 		*(D3DXVECTOR4*)pMatrix->m[Y] = normal;
 		OrthoNormalizeAbout(GetMatrix(), Y);
 	}
@@ -266,3 +281,4 @@ public:
 		return &velocity;
 	}
 };
+#endif
