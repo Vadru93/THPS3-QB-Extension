@@ -224,7 +224,7 @@ struct MovingObject
 				bboxMax.z = sector->vertices[i].z;
 			if (sector->vertices[i].z < bboxMin.z)
 				bboxMin.z = sector->vertices[i].z;
-			vertices[i] = sector->vertices[i] - pos;
+			//vertices[i] = sector->vertices[i] - pos;
 		}
 		sector->bboxMax = bboxMax;
 		sector->bboxMin = bboxMin;
@@ -403,7 +403,7 @@ struct MovingObject
 		//D3DXMatrixIdentity(&orient);
 
 
-		_printf("MovingObject on the move(%f %f %f) dt:%f timer:%f end:%f\n", pos.x, pos.y, pos.z, delta, timer, end);
+		//_printf("MovingObject on the move(%f %f %f) dt:%f timer:%f end:%f\n", pos.x, pos.y, pos.z, delta, timer, end);
 
 		timer += delta;
 		switch (Type)
@@ -472,10 +472,11 @@ struct MovingObject
 				}
 
 				//If 1 link use it, else pick a random one
-				if (link->GetNumItems() == 1)
+				int numLinks = links->GetNumItems();
+				if (numLinks == 1)
 					link = Node::GetNodeStructByIndex((*links)[0]);
 				else
-					link = Node::GetNodeStructByIndex((*links)[Rnd(link->GetNumItems())]);//Pick a random path
+					link = Node::GetNodeStructByIndex((*links)[Rnd(numLinks)]);//Pick a random path
 				if (!link)
 				{
 					RemoveMovingObject(sector);
@@ -651,9 +652,9 @@ struct MovingObject
 				float velocityAngle = max(goalAngle.x, 0.001f);//clamp the angle to be minimum 0.001
 				angle.x += velocityAngle;//add the velocity to current angle
 				//the final angle now is 89.657394, but why is the object moving??
-				printf("currentAngle %f velocityAngle %f accelerationAngle %f\n", angle.x * 180 / D3DX_PI, velocityAngle, acceleration.x*0.33f);
+				printf("currentAngle %f\n", angle.x * 180 / D3DX_PI);// , velocityAngle);
 
-				D3DXMatrixRotationYawPitchRoll(&nodeRotation, 0, velocityAngle, 0);
+				D3DXMatrixRotationYawPitchRoll(&nodeRotation, 0, angle.x, 0);
 	
 
 				//make a new bbox in a temp location so we can keep the actual bbox

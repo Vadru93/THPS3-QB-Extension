@@ -11,7 +11,7 @@ struct EXTERN CArray
 	union
 	{
 		CStructHeader** Items;
-		NodeContainer* container;
+		int* indices;
 	};
 	WORD Type;
 	WORD NumItems;
@@ -22,10 +22,18 @@ struct EXTERN CArray
 			_printf("Unsupported ArrayType\n");
 			return x;
 		}
-		if (x > NumItems)
-			_printf("###TOOO HIGH INDEX IN CARRAY!!!###\n");
-		x &= NumItems;
-		return container->index;
+		if (x >= NumItems)
+		{
+			_printf("###TOOO HIGH INDEX IN CARRAY(%d)!!!###\n", x);
+			x = (NumItems - 1);
+		}
+		
+		if (NumItems > 1)
+		{
+			_printf("NODE %p NumItms %d RANDOM(%d)\n\n", this, NumItems, x);
+			//MessageBox(0, "", "", 0);
+		}
+		return  *(indices+x);
 	}
 
 	int GetNumItems();
@@ -125,9 +133,11 @@ struct EXTERN CArray
 
 	CStructHeader* GetCStruct(DWORD index)
 	{
-		if (index > 0xFFFF)
+		if (index >= 0xFFFF)
+		{
 			_printf("###WARNING INDEX TOO HIGH###\n");
-		index &= 0xFFFF;
+			index = (NumItems - 1);
+		}
 		_printf("Index %d %p\n", index, Items[index]);
 		return *(CStructHeader**)Items[index];
 	}

@@ -29,7 +29,7 @@ struct Mesh
 
 	void Update()
 	{
-		_printf("Updating VertexBuffer\n");
+		//_printf("Updating VertexBuffer\n");
 		state |= 0x200;
     }
 };

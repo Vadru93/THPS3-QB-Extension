@@ -400,11 +400,11 @@ struct CStructHeader
 	}
 };
 
-struct NodeContainer
+/*struct NodeContainer
 {
 	int index;
 	D3DXVECTOR3 pos;
-};
+};*/
 
 
 //CStructHeader Container.
