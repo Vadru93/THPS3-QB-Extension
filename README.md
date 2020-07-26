@@ -4,9 +4,10 @@
 ###BIG CHANGES###
 
 LevelMod.flt is now deprecated. Now you only need d3d8.dll and you should remove all instances of levelmod.flt including copies. If game finds flt file in same folder as skate3.exe or data/MILES, it will try to load it and since it's already loaded inside d3d8.dll it will crash.
+
 Also Skate3.exe is no longer needed, because d3d8.dll is loaded earlier so I change everything in memory instead.
 
-1. Include Extension.h and add the Levelmod.lib to your project.
+1. Include Extension.h and add the d3d8.lib to your project.
 
 2. If you use VS you need to set USE MULTI BYTE CHARSET.
 
