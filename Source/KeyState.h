@@ -22,21 +22,16 @@ private:
 public:
 	enum
 	{
-		UP, DOWN, LEFT, RIGHT, SPINLEFT, NOLLIE, SPINRIGHT, REVERT, GRAB, FLIP, GRIND, OLLIE
+		NONE = -1, UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3, SPINLEFT = 4, NOLLIE = 5, SPINRIGHT = 6, REVERT = 7, GRAB = 8, FLIP = 9, GRIND = 10, OLLIE = 11
 	};
 
-	void Press(float time)
+	void Update(DWORD press)//the press is between 0x0-0xFF, press below or equal to 0x40 is deadzone
 	{
-		pressed = 1;
-		timepress = time;
-		//holding = sensitivity;
+		_printf("Updating press %d\nKeyState %p chc %X\n", press, this, this->checksum);
+		typedef void(__thiscall* const pUpdate)(KeyState* pThis, DWORD press);
+		pUpdate(0x0049BAA0)(this, press);
 	}
 
-	void Unpress(float time)
-	{
-		pressed = 0;
-		timerelease = time;
-	}
 
 	float GetReleasedTime()
 	{

@@ -46,8 +46,9 @@ enum enum_vertex
 { \
 if (InvalidReadPtr(p)) \
 { \
-  MessageBox(0, _T("Parameter ") _T(#p) \
-  _T(" is not a valid read pointer\r\n"), __FUNCTION__, 0); return NULL; \
+  _printf( _T("Parameter ") _T(#p) \
+  _T(" is not a valid read pointer\r\n") \
+  _T("CFUNC ")  __FUNCTION__ _T("\r\n")); return NULL; \
 } \
 }
 
@@ -56,8 +57,9 @@ if (InvalidReadPtr(p)) \
 { \
 if (InvalidReadPtr(p, s)) \
 { \
-  MessageBox(0, _T("Parameter ") _T(#p) \
-  _T(" is not a valid read area\r\n"), __FUNCTION__, 0); return NULL; \
+  _printf( _T("Parameter ") _T(#p) \
+  _T(" is not a valid read area\r\n") \
+  _T("CFUNC ") __FUNCTION__ _T("\r\n")); return NULL; \
 } \
 }
 

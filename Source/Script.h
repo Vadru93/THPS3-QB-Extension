@@ -789,7 +789,7 @@ struct EXTERN CStruct
 			{
 				*header = pThis;
 				return true;
-			}
+			}	
 			if (pThis->NextHeader)
 				pThis = pThis->NextHeader;
 			else

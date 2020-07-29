@@ -104,10 +104,10 @@ unsigned long crc32f(unsigned char* buf)
 template<size_t idx>
 constexpr uint32_t crc32(const char* str)
 {
-    char c = str[idx];
-    if (c >= 'A' && c <= 'Z') c += 32;
-    if (c == '/') c = '\\';
-    return (crc32<idx - 1>(str) >> 8) ^ checksumTable[(crc32<idx - 1>(str) ^ c) & 0x000000FF];
+    /*char c = str[idx];
+    if (c >= 'A' && c <= 'Z') c += 32;*/
+    //if (c == '/') c = '\\';
+    return (crc32<idx - 1>(str) >> 8) ^ checksumTable[(crc32<idx - 1>(str) ^ str[idx]) & 0x000000FF];
 }
 
 // This is the stop-recursion function
@@ -125,47 +125,62 @@ namespace Checksums
 {
     enum CompileTimeChecksums//Generated at compile-time for improved performance and code readability
     {
-        Class = COMPILE_CRC32("Class"),
-        Name = COMPILE_CRC32("Name"),
-        Position = COMPILE_CRC32("Position"),
-        Pos = COMPILE_CRC32("Pos"),
-        Angles = COMPILE_CRC32("Angles"),
-        Kill = COMPILE_CRC32("Kill"),
-        Invisible = COMPILE_CRC32("Invisible"),
-        Shatter = COMPILE_CRC32("Shatter"),
-        Create = COMPILE_CRC32("Create"),
-        ShatterAndDie = COMPILE_CRC32("ShatterAndDie"),
-        Visible = COMPILE_CRC32("Visisble"),
-        GameObject = COMPILE_CRC32("GameObject"),
-        LevelGeometry = COMPILE_CRC32("LevelGeometry"),
-        LevelObject = COMPILE_CRC32("LevelObject"),
-        InNetGame = COMPILE_CRC32("InNetGame"),
-        Cluster = COMPILE_CRC32("Cluster"),
-        TerrainType = COMPILE_CRC32("TerrainType"),
-        Type = COMPILE_CRC32("Type"),
-        TriggerScripts = COMPILE_CRC32("TriggerScripts"),
-        PedAI = COMPILE_CRC32("PedAI"),
+        Class = COMPILE_CRC32("class"),
+        Name = COMPILE_CRC32("name"),
+        Position = COMPILE_CRC32("position"),
+        Pos = COMPILE_CRC32("pos"),
+        Angles = COMPILE_CRC32("angles"),
+        Kill = COMPILE_CRC32("kill"),
+        Invisible = COMPILE_CRC32("invisible"),
+        Shatter = COMPILE_CRC32("shatter"),
+        Create = COMPILE_CRC32("create"),
+        ShatterAndDie = COMPILE_CRC32("shatteranddie"),
+        Visible = COMPILE_CRC32("visisble"),
+        GameObject = COMPILE_CRC32("gameobject"),
+        LevelGeometry = COMPILE_CRC32("levelgeometry"),
+        LevelObject = COMPILE_CRC32("levelobject"),
+        InNetGame = COMPILE_CRC32("innetgame"),
+        Cluster = COMPILE_CRC32("cluster"),
+        TerrainType = COMPILE_CRC32("terraintype"),
+        Type = COMPILE_CRC32("type"),
+        TriggerScripts = COMPILE_CRC32("triggerscripts"),
+        PedAI = COMPILE_CRC32("pedai"),
         DEFAULT = COMPILE_CRC32("default"),
-        TrickObject = COMPILE_CRC32("TrickObject"),
-        TrickOb = COMPILE_CRC32("TrickOb"),
-        AbsentInNetGames = COMPILE_CRC32("AbsentInNetGames"),
-        NetEnabled = COMPILE_CRC32("NetEnabled"),
-        Permanent = COMPILE_CRC32("Permanent"),
-        CreatedAtStart = COMPILE_CRC32("CreatedAtStart"),
-        Links = COMPILE_CRC32("Links"),
-        Waypoint = COMPILE_CRC32("Waypoint"),
-        Restart = COMPILE_CRC32("Restart"),
+        Value = COMPILE_CRC32("value"),
+        TrickObject = COMPILE_CRC32("trickobject"),
+        TrickOb = COMPILE_CRC32("trickob"),
+        AbsentInNetGames = COMPILE_CRC32("absentinnetgames"),
+        NetEnabled = COMPILE_CRC32("netenabled"),
+        Permanent = COMPILE_CRC32("permanent"),
+        CreatedAtStart = COMPILE_CRC32("createdatstart"),
+        Links = COMPILE_CRC32("links"),
+        Waypoint = COMPILE_CRC32("waypoint"),
+        Restart = COMPILE_CRC32("restart"),
         Relpos = COMPILE_CRC32("relpos"),
-        Normal_Lerp_Speed = COMPILE_CRC32("Normal_Lerp_Speed"),
-        OnServer = COMPILE_CRC32("OnServer"),
-        ANGULAR_VELOCITY = COMPILE_CRC32("ANGULAR_VELOCITY"),
-        MOVE_TO_POS = COMPILE_CRC32("MOVE_TO_POS"),
-        ORIENT = COMPILE_CRC32("ORIENT"),
-        FUNCTION = COMPILE_CRC32("Function"),
+        Normal_Lerp_Speed = COMPILE_CRC32("normal_lerp_speed"),
+        OnServer = COMPILE_CRC32("onserver"),
+        ANGULAR_VELOCITY = COMPILE_CRC32("angular_velocity"),
+        MOVE_TO_POS = COMPILE_CRC32("move_to_pos"),
+        ORIENT = COMPILE_CRC32("orient"),
+        FUNCTION = COMPILE_CRC32("function"),
         param = COMPILE_CRC32("param"),
         text = COMPILE_CRC32("text"),
         //Physics_Air_Gravity = COMPILE_CRC32("physics_air_gravity"),
         CHEAT_MOON = COMPILE_CRC32("cheat_moon"),
+
+        LM_Control_bRevert = COMPILE_CRC32("lm_control_brevert"),
+        LM_Control_SpineButton  = 0x2A135B22,//COMPILE_CRC32("lm_control_spinebutton"),
+        LM_Control_bNewTricks = 0x0760404D, //COMPILE_CRC32("lm_control_bnewtricks"),
+        LM_Control_AirTrickSpeed = 0x24A516D2, //COMPILE_CRC32("lm_control_airtrickspeed"),
+        LM_GUI_bShowGrafCounter = 0x77823453, //COMPILE_CRC32("lm_gui_bshowgrafcounter"),
+        LM_GUI_bShowHud = 0x71ACFD96, //COMPILE_CRC32("lm_gui_bshowhud"),
+        LM_GUI_bNewMenu = COMPILE_CRC32("lm_gui_bnewmenu"),
+        LM_BugFix_bTeleFix = COMPILE_CRC32("lm_bugfix_btelefix"),
+        LM_BugFix_bSoundFix = 0x01D8084A, //COMPILE_CRC32("lm_bugfix_bsoundfix"),
+        LM_GameOption_bLimitTags = 0xE3439B74, //COMPILE_CRC32("lm_gameoption_blimittags"),
+        LM_GameOption_bGrass = 0x960BE926, //COMPILE_CRC32("lm_gameoption_bgrass"),
+        LM_DebugOption_bDebugMode = 0x5EC80650, //COMPILE_CRC32("lm_debugoption_bdebugoption"),
+        
     };
 };
 #endif
