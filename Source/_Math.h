@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _MATH_H
-#define _MATH_H
+#ifndef __MATH_H
+#define __MATH_H
 #include "defines.h"
 #include <d3dx9.h>
 #include <d3dx9core.h>
@@ -55,7 +55,7 @@ D3DXVECTOR3& Transform(D3DXVECTOR3& V, D3DXMATRIX& M)
 	float y = V.x * M._12 + V.y * M._22 + V.z * M._32 + M._42;
 	float z = V.x * M._13 + V.y * M._23 + V.z * M._33 + M._43;
 	//float w = V.x * M._14 + V.y * M._24 + V.z * M._34 + M._44; <- don't need scaling for now
-	
+
 	Out.x = x;
 	Out.y = y;
 	Out.z = z;
@@ -236,7 +236,7 @@ struct Vertex : D3DXVECTOR3
 	}
 
 	EXTERN Vertex& Rotate(const Vertex& axis, const float angle);
-	
+
 
 	void Scale(float scale)
 	{
@@ -664,16 +664,121 @@ struct Matrix : D3DXMATRIX
 		return *this;
 	}
 
-	void GetRotationAxisAndAngle(Vertex* pAxis, float* pRadians)
+	void GetRotationAxisAndAngle(Vertex* pAxis, float* pRadians, D3DXVECTOR3& start, D3DXVECTOR3& end, bool hip_transfer = false)
 	{
 		float		nTwoSinTheta, nTwoCosTheta;
 		Vertex	vTwoSinThetaAxis;
+		bool reverse = false;
 
 		nTwoCosTheta = m[RIGHT][X] + m[UP][Y] + m[AT][Z] - 1.0f;
 
-		vTwoSinThetaAxis.x = m[UP][Z] - m[AT][Y];
-		vTwoSinThetaAxis.y = m[AT][X] - m[RIGHT][Z];
-		vTwoSinThetaAxis.z = m[RIGHT][Y] - m[UP][X];
+		float xDiff = fabsf(start.x - end.x);
+		if (xDiff >= 10.0f)//x diff is big enough, so apply rotation on Z axis
+			vTwoSinThetaAxis.z = m[RIGHT][Y] - m[UP][X];
+		else
+			vTwoSinThetaAxis.z = 0.0f;
+		float zDiff = fabsf(start.z - end.z);
+		if (zDiff >= 10.0f)//z diff is big enough, so apply rotation on X axis
+			vTwoSinThetaAxis.x = -m[UP][Z] - m[AT][Y];
+		else
+			vTwoSinThetaAxis.x = 0.0f;
+		vTwoSinThetaAxis.y = 0.0f;// don't rotate Y since this bugs us..
+
+		//If we have rotation on both X and Z it means we do a hip_transfer, or our velocity made us drift in the QP
+		if (vTwoSinThetaAxis.x && vTwoSinThetaAxis.z) [[unlikely]]
+		{
+			if (hip_transfer) [[unlikely]]//hip_transfer, keeep both rotations
+			{
+				_printf("An unlikely event..\n");
+		        /*vTwoSinThetaAxis.x = m[UP][Z] - m[AT][Y];
+                vTwoSinThetaAxis.z = m[UP][X] - m[RIGHT][Y];*/
+			}
+			else//need to check if we just drifted or if this is a non vertical ramp
+			{
+				_printf("drifted?");
+				if (xDiff > zDiff)
+				{
+					if ((xDiff - zDiff) > 80.0f)//we just drifted, so rotate ONLY on the longest distance
+					{
+						vTwoSinThetaAxis.x = 0.0f;
+						_printf(" YES\n");
+					}
+					else
+					{
+						_printf(" NO 1\n");
+						//vTwoSinThetaAxis.x = m[UP][Z] - m[AT][Y];
+						//vTwoSinThetaAxis.y = m[AT][X] - m[RIGHT][Z];
+						///vTwoSinThetaAxis.z = 0;// m[UP][X] - m[RIGHT][Y];
+						//reverse = true;
+						vTwoSinThetaAxis.x = m[UP][Z] - m[AT][Y];
+						vTwoSinThetaAxis.y = m[AT][X] - m[RIGHT][Z];
+						vTwoSinThetaAxis.z = m[RIGHT][Y] - m[UP][X];
+					}
+				}
+				else
+				{
+					if ((zDiff - xDiff) > 80.0f)//we just drifted, so rotate ONLY on the longest distance
+					{
+						vTwoSinThetaAxis.z = 0.0f;
+						_printf(" YES\n");
+					}
+					else
+					{
+						//reverse = true;
+						_printf(" NO 2\n");
+						vTwoSinThetaAxis.x = m[UP][Z] - m[AT][Y];
+						vTwoSinThetaAxis.y = m[AT][X] - m[RIGHT][Z];
+						vTwoSinThetaAxis.z = m[RIGHT][Y] - m[UP][X];
+						//vTwoSinThetaAxis.z = 0.5f;
+						//vTwoSinThetaAxis.z = 0.5f;
+						//vTwoSinThetaAxis.z = -m[RIGHT][Y] - m[UP][X];// *= -1.0f;// m[UP][X] - m[RIGHT][Y];
+						/*vTwoSinThetaAxis.x = 0;// m[UP][Z] - m[AT][Y];
+						//vTwoSinThetaAxis.y =  m[AT][X] - m[RIGHT][Z];
+						vTwoSinThetaAxis.z = 0;// m[UP][X] - m[RIGHT][Y];*/
+					}
+				}
+			}
+
+		}
+		/*vTwoSinThetaAxis.x = -m[UP][Z] - m[AT][Y];
+		vTwoSinThetaAxis.y = 0;// -m[UP][Z] - m[AT][Y];
+		vTwoSinThetaAxis.z = 0;// -m[UP][Z] - m[AT][Y];*/
+			// 0.0f;// m[RIGHT][Y] - m[UP][X];
+		_printf("theta %f %f %f\nstart %f %f\nend %f %f\n", vTwoSinThetaAxis.x, vTwoSinThetaAxis.y, vTwoSinThetaAxis.z, start.x, start.z, end.x, end.z);
+
+		/*
+
+			vTwoSinThetaAxis.x = -m[UP][Z] - m[AT][Y];
+			vTwoSinThetaAxis.y = 0.0f;// m[AT][X] - m[RIGHT][Z];
+
+
+			*/
+
+			//vTwoSinThetaAxis.z = 0.0f;
+
+		/*if (vTwoSinThetaAxis.x >= 0.01f)
+			vTwoSinThetaAxis.z = 0;*/
+			//if (vTwoSinThetaAxis.z >= 0.1f || vTwoSinThetaAxis.z <= -0.1f)
+
+
+				/*
+
+			if((vTwoSinThetaAxis.z < -0.005f || vTwoSinThetaAxis.z >= 0.035f) && vTwoSinThetaAxis.x >= -1.003f && vTwoSinThetaAxis.x < 0.0f)
+				vTwoSinThetaAxis.x = 0;
+			else
+				vTwoSinThetaAxis.z = 0;
+			*/
+
+
+			/*if ((vTwoSinThetaAxis.x < -0.75f && vTwoSinThetaAxis.x >= -1.0f))
+			{
+				_printf("Inverting theta\n");
+				vTwoSinThetaAxis.x = 0.0f;// m[UP][Z] - m[AT][Y];
+				vTwoSinThetaAxis.y = 0.0f;// m[AT][X] - m[RIGHT][Z];
+				vTwoSinThetaAxis.z = m[RIGHT][Y] - m[UP][X];
+			}*/
+
+		_printf("theta %f %f %f\n", vTwoSinThetaAxis.x, vTwoSinThetaAxis.y, vTwoSinThetaAxis.z);
 
 		// Gary:  There used to be a magic patch added by Dave
 		// (basically negating the axis) which made it work with
@@ -682,8 +787,8 @@ struct Matrix : D3DXMATRIX
 		// in the code just in case our Slerp stops working...
 		/*vTwoSinThetaAxis.x = m[AT][Y] - m[UP][Z];
 		vTwoSinThetaAxis.y = m[RIGHT][Z] - m[AT][X];
-		vTwoSinThetaAxis.y = 0.0f;// m[UP][X] - m[RIGHT][Y];
-		vTwoSinThetaAxis.z = 0.0f;*/
+		vTwoSinThetaAxis.y = m[UP][X] - m[RIGHT][Y];*/
+		//vTwoSinThetaAxis.z = m[UP][X] - m[RIGHT][Y] ;
 		//vTwoSinThetaAxis.W = 1.0f;
 
 		nTwoSinTheta = vTwoSinThetaAxis.Length();
@@ -703,6 +808,7 @@ struct Matrix : D3DXMATRIX
 		(*pRadians) = (float)atan2(nTwoSinTheta, nTwoCosTheta);
 		if ((nTwoSinTheta <= 0.01f) && (nTwoCosTheta <= 0.0f))
 		{
+			_printf("\n\nERROR THETA\n\n");
 			/*
 			* sin theta is 0; cos theta is -1; theta is 180 degrees
 			* vTwoSinThetaAxis was degenerate
@@ -761,6 +867,11 @@ struct Matrix : D3DXMATRIX
 
 			*pAxis = vTwoSinThetaAxis;
 			pAxis->Normalize();
+		}
+		if (reverse)
+		{
+			*pAxis = *(Vertex*)&(-*pAxis);
+			(*pRadians) = (2.0f * D3DX_PI) - (*pRadians);
 		}
 	}
 
@@ -830,7 +941,7 @@ struct Matrix : D3DXMATRIX
 
 		rotY.m[AT][X] = sY;
 		rotY.m[AT][Y] = -sX;
-		rotY.m[AT][Z] = cY*cX;
+		rotY.m[AT][Z] = cY * cX;
 		rotY.m[AT][W] = 0.0f;
 
 		rotY.m[POS][X] = 0.0f;
@@ -853,7 +964,7 @@ struct Matrix : D3DXMATRIX
 		rotX.m[RIGHT][Y] = 0.0f;
 		rotX.m[RIGHT][Z] = 0.0f;
 		rotX.m[RIGHT][W] = 0.0f;
-		
+
 		rotX.m[UP][X] = 0.0f;
 		rotX.m[UP][Y] = c;
 		rotX.m[UP][Z] = s;
@@ -901,7 +1012,7 @@ struct Matrix : D3DXMATRIX
 		return rotY;
 	}
 
-	const Vertex & operator[](int index) const
+	const Vertex& operator[](int index) const
 	{
 		return *(Vertex*)&m[index];
 	}
@@ -915,7 +1026,7 @@ struct Matrix : D3DXMATRIX
 	inline Matrix& RotateYLocal(const float angle)
 	{
 
-		CreateRotateYMatrix(*this, angle) * *this;
+		CreateRotateYMatrix(*this, angle)** this;
 
 		return *this;
 	}
@@ -938,7 +1049,7 @@ struct Matrix : D3DXMATRIX
 
 
 
-	
+
 };
 
 static int RandSeed;

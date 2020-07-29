@@ -97,9 +97,9 @@ bool GetSliderValue(CStruct* pStruct, CScript* pScript)
 {
 	int name = 0;
 	pStruct->GetScript("id", &name);
-	int paramName = -255;
-	pStruct->GetScript("name", &paramName);
-    if(paramName!=-255)
+	int paramName = 0;
+
+    if(pStruct->GetScript("name", &paramName))
 	{
 		CStructHeader* param = NULL;
 
@@ -122,10 +122,9 @@ bool GetSliderValue(CStruct* pStruct, CScript* pScript)
 //Change the values of a struct, check optionsmenu.qb
 bool ChangeValues(CStruct* pStruct, CScript* pScript)
 {
-	int container = -255;
+	int container = 0;
 
-	pStruct->GetScript("Container", &container);
-	if(container!=-255)
+	if(pStruct->GetScript("Container", &container))
 	{
 		QBKeyHeader* pContainer = GetQBKeyHeader(container);
 		if (pContainer)

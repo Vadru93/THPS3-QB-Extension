@@ -102,6 +102,15 @@ private://0575a190
 //#pragma pop(pack)
 public:
 
+	float GetCurrentTime()
+	{
+		static const DWORD timer = 0x00409AE0;
+		_asm call timer
+		static float temp = 0;
+		_asm mov temp, eax
+		return temp;
+	}
+
 	static DWORD GetCamModeAddress()
 	{
 		DWORD ptr = *(DWORD*)0x00930BB0;
@@ -126,6 +135,19 @@ public:
 		*(D3DXVECTOR4*)pMatrix->m[Y] = normal;
 		OrthoNormalizeAbout(GetMatrix(), Y);
 	}
+	void SetNormalFast(D3DXVECTOR4& normal)
+	{
+
+		D3DXMATRIX* pMatrix = GetMatrix();
+		displaynormal = *(D3DXVECTOR4*)pMatrix->m[Y];
+		currentnormal = normal;
+		lastdisplaynormal = displaynormal;
+		normallerp = 1.0f;
+		*(D3DXVECTOR4*)pMatrix->m[Y] = normal;
+		OrthoNormalizeAbout(GetMatrix(), Y);
+	}
+
+
 
 
 	typedef bool(__thiscall* const pCallMemberFunction)(Skater* pThis, DWORD checksum, CStruct* pStruct, CScript* pScript);
@@ -215,6 +237,8 @@ public:
 
 	//Tell Physcs we are inside vert air
 	EXTERN void SetVertAir(bool value);
+
+	EXTERN void SetCanBreakVert(bool value);
 
 	typedef void(__thiscall* const pTriggerScript)(Skater* pThis, DWORD triggerType, void*);
 	void TriggerScript(DWORD triggerType)

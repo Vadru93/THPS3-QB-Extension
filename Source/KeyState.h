@@ -1,5 +1,13 @@
 #pragma once
+#ifndef _KeyState_H_
+#define _KeyState_H_
 #include "Defines.h"
+#include "source/CXBOXController.h"
+struct Skater;
+EXTERN CXBOXController* Player1;
+
+
+
 
 struct KeyState
 {
@@ -17,6 +25,19 @@ public:
 		UP, DOWN, LEFT, RIGHT, SPINLEFT, NOLLIE, SPINRIGHT, REVERT, GRAB, FLIP, GRIND, OLLIE
 	};
 
+	void Press(float time)
+	{
+		pressed = 1;
+		timepress = time;
+		//holding = sensitivity;
+	}
+
+	void Unpress(float time)
+	{
+		pressed = 0;
+		timerelease = time;
+	}
+
 	float GetReleasedTime()
 	{
 		return timerelease;
@@ -33,3 +54,8 @@ public:
 	}
 
 };
+
+
+EXTERN void ProxyPad(Skater* skater);
+
+#endif

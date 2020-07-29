@@ -164,6 +164,8 @@ namespace Checksums
         FUNCTION = COMPILE_CRC32("Function"),
         param = COMPILE_CRC32("param"),
         text = COMPILE_CRC32("text"),
+        //Physics_Air_Gravity = COMPILE_CRC32("physics_air_gravity"),
+        CHEAT_MOON = COMPILE_CRC32("cheat_moon"),
     };
 };
 #endif
