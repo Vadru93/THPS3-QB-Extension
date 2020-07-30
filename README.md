@@ -22,11 +22,11 @@ Also Skate3.exe is no longer needed, because d3d8.dll is loaded earlier so I cha
 
 * **ChangeString** Example: `ChangeString string = StringToChange param = TherNewString` always returns true
 *	**strstr** Example: `strstr s1 = "Here is a string" s2 = "string"` returns true if s1 contains s2
-*	**GetZAngle** angle is stored in GLOBAL.angle and GLOBAL.angle need to exist before calling GetZAngle always returns true
-*	**GetSpeed** same as above but stored in GLOBAL.speed always returns true
-* **GetSkaterPos** same as above but stored in GLOBAL.pos always returns true
-* **GetSkaterLook** same as above but stored in GLOBAL.pos always returns true
-* **CreatePair** Example: `CreatePair Name = "NameToStore" x = 1.0 y = 2.0` acces it with GLOBAL.NameToStore
+*	**GetZAngle** angle is stored in `GLOBAL.angle` and `GLOBAL.angle` need to exist before calling **GetZAngle** always returns true
+*	**GetSpeed** same as above but stored in `GLOBAL.speed` always returns true
+* **GetSkaterPos** same as above but stored in `GLOBAL.pos` always returns true
+* **GetSkaterLook** same as above but stored in `GLOBAL.pos` always returns true
+* **CreatePair** Example: `CreatePair Name = "NameToStore" x = 1.0 y = 2.0` acces it with `GLOBAL.NameToStore`
 * **TestForAcid** depricated
 *	**Wallplant** This is an unfinished wallplant script always returns true
 * **PreWallplant** Related to unfinished wallplant always returns true
@@ -44,7 +44,7 @@ Also Skate3.exe is no longer needed, because d3d8.dll is loaded earlier so I cha
 * **ChangeValues** Example: `ChangeValues Container = AStruct values = BStruct` Sets values from BStruct to AStruct returns true if find params, else false
 * **GetSliderValue** Example: `GetSliderValue id = element_id ||name = NameToStore||` 
 
-acces it with GLOBAL.NameToStore if no name is passed acces with GLOBAL.value returns true on sucess
+acces it with `GLOBAL.NameToStore` if no name is passed acces with `GLOBAL.value` returns true on sucess
 * **InitLevelMod** Inits levelmod stuff
 * **MoveObject** Move an EnvironmentObject
 * **KillMovingObject** Stop Moving an EnvironmentObject
