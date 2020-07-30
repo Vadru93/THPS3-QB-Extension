@@ -8,7 +8,7 @@ EXTERN CXBOXController* Player1;
 
 
 
-
+EXTERN char* FindChecksumName(DWORD checksum);
 struct KeyState
 {
 private:
@@ -25,11 +25,37 @@ public:
 		NONE = -1, UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3, SPINLEFT = 4, NOLLIE = 5, SPINRIGHT = 6, REVERT = 7, GRAB = 8, FLIP = 9, GRIND = 10, OLLIE = 11
 	};
 
-	void Update(DWORD press)//the press is between 0x0-0xFF, press below or equal to 0x40 is deadzone
+	DWORD GetChecksum()
 	{
-		_printf("Updating press %d\nKeyState %p chc %X\n", press, this, this->checksum);
+		return checksum;
+	}
+
+	//original game function
+	void Update(DWORD press)
+	{
 		typedef void(__thiscall* const pUpdate)(KeyState* pThis, DWORD press);
 		pUpdate(0x0049BAA0)(this, press);
+	}
+
+	
+	//the press is between 0x0-0xFF, press below or equal to 0x40 is deadzone
+	void Update(float time, DWORD press)
+	{
+		_printf("press %X\nKeyState %p %s(%X)\n", press, this, FindChecksumName(this->checksum), this->checksum);
+		//the press is between 0x0-0xFF, press below or equal to 0x40 is deadzone
+		if (press > 0x40)
+		{
+			pressed = 1;
+			timepress = time;
+			holding = press;
+		}
+		else
+		{
+			pressed = 0;
+			timerelease = time;
+			holding = press;
+		}
+
 	}
 
 
@@ -49,8 +75,5 @@ public:
 	}
 
 };
-
-
-EXTERN void ProxyPad(Skater* skater);
 
 #endif

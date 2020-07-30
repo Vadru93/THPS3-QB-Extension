@@ -22,7 +22,14 @@ EXTERN Hooked_Present pHookedPresent;*/
 
 
 
-
+float _GetCurrentTime()
+{
+	static const DWORD timer = 0x00409AE0;
+	_asm call timer
+	static float temp = 0;
+	_asm mov temp, eax
+	return;
+}
 
 //Set Element Text
 inline void SetElementText(int id, char* text)

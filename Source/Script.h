@@ -77,7 +77,8 @@ struct EXTERN CScript
 		ZeroMemory(this, sizeof(CScript));
 	}
 
-
+	bool GotParam(DWORD name);
+	CStructHeader* GetParam(DWORD name);
 
 	static CScript* GetNextScript(CScript* pScript = NULL)
 	{
@@ -432,10 +433,18 @@ struct EXTERN CStruct
 
 	CStructHeader* AddParam(const char* name, QBKeyHeader::QBKeyType type);
 
-	typedef CStructHeader* (__thiscall* const mallocx)(CStruct* pThis);
-	inline CStructHeader* AllocateCStruct()
+	typedef CStructHeader* (__cdecl* const mallocx)();
+	inline CStructHeader* AllocateCStruct(bool Allocate=false)
 	{
-		return mallocx(0x00428B90)(this);
+		if (Allocate)
+		{
+			bool oldValue = *(bool*)0x008E1DF8;
+			*(bool*)0x008E1DF8 = true;
+			CStructHeader* temp = mallocx(0x00428B90)();
+			*(bool*)0x008E1DF8 = oldValue;
+			return temp;
+		}
+		return mallocx(0x00428B90)();
 	}
 	typedef CStructHeader* (__cdecl* const freex)(CStructHeader* param);
 	inline CStructHeader* DellocateCStruct(CStructHeader* param)

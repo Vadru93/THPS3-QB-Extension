@@ -169,9 +169,10 @@ namespace Checksums
         CHEAT_MOON = COMPILE_CRC32("cheat_moon"),
 
         LM_Control_bRevert = COMPILE_CRC32("lm_control_brevert"),
-        LM_Control_SpineButton  = 0x2A135B22,//COMPILE_CRC32("lm_control_spinebutton"),
+        LM_Control_SpineButton = 0x2A135B22,//COMPILE_CRC32("lm_control_spinebutton"),
         LM_Control_bNewTricks = 0x0760404D, //COMPILE_CRC32("lm_control_bnewtricks"),
         LM_Control_AirTrickSpeed = 0x24A516D2, //COMPILE_CRC32("lm_control_airtrickspeed"),
+        LM_Control_bXinput = COMPILE_CRC32("lm_control_bxinput"),
         LM_GUI_bShowGrafCounter = 0x77823453, //COMPILE_CRC32("lm_gui_bshowgrafcounter"),
         LM_GUI_bShowHud = 0x71ACFD96, //COMPILE_CRC32("lm_gui_bshowhud"),
         LM_GUI_bNewMenu = COMPILE_CRC32("lm_gui_bnewmenu"),
@@ -180,6 +181,13 @@ namespace Checksums
         LM_GameOption_bLimitTags = 0xE3439B74, //COMPILE_CRC32("lm_gameoption_blimittags"),
         LM_GameOption_bGrass = 0x960BE926, //COMPILE_CRC32("lm_gameoption_bgrass"),
         LM_DebugOption_bDebugMode = 0x5EC80650, //COMPILE_CRC32("lm_debugoption_bdebugoption"),
+
+        Key = COMPILE_CRC32("key"),
+        Zone = COMPILE_CRC32("zone"),
+        Flag = COMPILE_CRC32("flag"),
+        Crown = COMPILE_CRC32("crown"),
+        Spawn = COMPILE_CRC32("spawn"),
+        
         
     };
 };
