@@ -417,6 +417,7 @@ script frontend_menu_on_show
   //1 = Th4 Speed
   //2 = Fast Air Speed
   AddOption name = "LM_Control_AirTrickSpeed" Value = 0
+  AddOption name = "LM_Control_bXinput", value = 0
   AddOption name = "LM_GUI_bShowHud" Value = 1
   AddOption name = "LM_GUI_bNewMenu" Value = 1
    AddOption name = "LM_GUI_bShowGrafCounter" Value = 1
