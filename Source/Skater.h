@@ -53,7 +53,7 @@ struct SkaterProfileContainer
 EXTERN struct Skater//GetSkaterInfo 004769D0
 {
 private://0575a190
-	DWORD memberFunctions;
+	DWORD** memberFunctions;
 	BYTE unk1[0x14];
 	D3DXVECTOR3 position;
 	float positionW;//1.0f
@@ -61,9 +61,11 @@ private://0575a190
 	float oldposW;//1.0f
 	BYTE unk4[0x2FC];
 	D3DXVECTOR3 velocity;
-	BYTE unk5[0x14];
+	float random;//1.0 when standing still, else a high number
+	BYTE unk5[0x10];
 	D3DXMATRIX matrix;
-	BYTE unknown5[0x3F];
+	BYTE unknown5[0x3E];
+	bool bailOn;
 	bool landedfromvert;
 	bool truelandedfromvert;
 	BYTE unknown4[0x7F4B];
@@ -102,6 +104,16 @@ private://0575a190
 //#pragma pop(pack)
 public:
 
+
+	bool Vibrate()
+	{
+		return bailOn;
+	}
+
+	bool IsHost()
+	{
+		return *(bool*)(this + 0x84CC);
+	}
 	DWORD GetCurrentTime()
 	{
 		static const DWORD timer = 0x00409AE0;
@@ -165,9 +177,9 @@ public:
 	typedef bool(__thiscall* const pCallMemberFunction)(Skater* pThis, DWORD checksum, CStruct* pStruct, CScript* pScript);
 	bool CallMemberFunction(DWORD checksum, CStruct* pStruct, CScript* pScript)
 	{
-		DWORD function = *(DWORD*)memberFunctions + 4;
-		function = *(DWORD*)function;
-		return pCallMemberFunction(function)(this, checksum, pStruct, pScript);
+		DWORD* pMemberFunction = memberFunctions[1];
+		_printf("Skater -> MemberFunction %p\nName %s pStruct %p pScript %p\n", pMemberFunction, FindChecksumName(checksum), pStruct, pScript);
+		return pCallMemberFunction((DWORD)pMemberFunction)(this, checksum, pStruct, pScript);
 	}
 
 

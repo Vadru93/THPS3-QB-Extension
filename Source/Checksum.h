@@ -187,6 +187,14 @@ namespace Checksums
         Flag = COMPILE_CRC32("flag"),
         Crown = COMPILE_CRC32("crown"),
         Spawn = COMPILE_CRC32("spawn"),
+
+        Actuator = COMPILE_CRC32("actuator"),
+        Percent = COMPILE_CRC32("percent"),
+        Duration = COMPILE_CRC32("duration"),
+
+        OrientToNormal = COMPILE_CRC32("orienttonormal"),
+
+
         
         
     };

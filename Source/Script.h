@@ -434,7 +434,7 @@ struct EXTERN CStruct
 	CStructHeader* AddParam(const char* name, QBKeyHeader::QBKeyType type);
 
 	typedef CStructHeader* (__cdecl* const mallocx)();
-	inline CStructHeader* AllocateCStruct(bool Allocate=false)
+	static CStructHeader* AllocateCStruct(bool Allocate=false)
 	{
 		if (Allocate)
 		{
