@@ -19,7 +19,8 @@ Also Skate3.exe is no longer needed, because d3d8.dll is loaded earlier so I cha
 
 
 # List of All Functions that you can call from Script
-
+* **SomeNotes** When you call a function that will add a value to your params that you can access with GLOBAL
+* You need to have the value there in the params else it will not work
 * **ChangeString** Example: `ChangeString string = StringToChange param = TherNewString` always returns true
 *	**strstr** Example: `strstr s1 = "Here is a string" s2 = "string"` returns true if s1 contains s2
 *	**GetZAngle** angle is stored in `GLOBAL.angle` and `GLOBAL.angle` need to exist before calling **GetZAngle** always returns true
@@ -40,11 +41,12 @@ Also Skate3.exe is no longer needed, because d3d8.dll is loaded earlier so I cha
 * **AddToGlobal** used in thps4+ levels always returns true
 * **FreezeCamera** Freezes the camera always returns true
 * **UnfreezeCamera** Unfreeze the camera always returns true
-* **GrafStarted** Called from scripts when Graffiti is started so client can check if server has enabled unlimited tags
-* **ChangeValues** Example: `ChangeValues Container = AStruct values = BStruct` Sets values from BStruct to AStruct returns true if find params, else false
+* **GrafStarted** Called from scripts when Graffiti is started 
+* so client can check if server has enabled unlimited tags
+* **ChangeValues** Example: `ChangeValues Container = AStruct values = BStruct` 
+* Sets values from BStruct to AStruct returns true if find params, else false
 * **GetSliderValue** Example: `GetSliderValue id = element_id ||name = NameToStore||` 
-
-acces it with `GLOBAL.NameToStore` if no name is passed acces with `GLOBAL.value` returns true on sucess
+* acces it with `GLOBAL.NameToStore` if no name is passed acces with `GLOBAL.value` returns true on sucess
 * **InitLevelMod** Inits levelmod stuff
 * **MoveObject** Move an EnvironmentObject
 * **KillMovingObject** Stop Moving an EnvironmentObject
