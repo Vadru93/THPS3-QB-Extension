@@ -62,15 +62,15 @@ struct EXTERN CScript
 	BYTE* address;//address of where script - parser/executer is in script
 	CStruct* params;//params sent when called the script
 	void* extras;//extra stuff
-	BYTE unk[0x370];//bunch of zeros
+	BYTE unk[0x370];//not looked into
 	//linked list
 	CScript* next;
 	CScript* prev;
 	int nodeIndex;//-1 if no node
 	bool spawned;
-	BYTE unk3[3];
+	BYTE padding[3];
 	Node* node;
-	DWORD scriptChecksum;
+	DWORD scriptChecksum;//The name of the script
 
 	CScript()
 	{
