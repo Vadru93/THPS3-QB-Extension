@@ -243,7 +243,7 @@ SCRIPT LM_ToggleOption
 		
 			//give textonly param if we only want to update text
 			IF #"Not" GotParam TextOnly
-			printf "Toggle"
+				printf "Toggle"
 				ToggleOption <name>
 			ENDIF
 			
@@ -307,6 +307,12 @@ levelmod_menu_items = [
 	
 	//option to disable revert chain
 	{ LM_Menu_Shared_Bool id = LM_Control_bRevert_id params = { name = LM_Control_bRevert id = LM_Control_bRevert_id on = "Reverts: on" off = "Reverts: off" } }
+	
+	//option to disable wallieplant chain
+	{ LM_Menu_Shared_Bool id = LM_Control_bWalliePlant_id params = { name = LM_Control_bWalliePlant id = LM_Control_bWalliePlant_id on = "Wallieplant: on" off = "Wallieplant: off" } }
+	
+	//option to remove annoying messages
+	{ LM_Menu_Shared_Bool id = LM_GUI_bTrickNotifications_id params = { name = LM_GUI_bTrickNotifications id = LM_GUI_bTrickNotifications_id on = "Extra Messages: on" off = "Extra Messages: off" } }
 	
 	//Sets spine button
 	//0 = Revert
