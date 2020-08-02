@@ -8,15 +8,18 @@ script start_main_menu
   PlaySkaterCamAnim skater = 0 name = "Cam_MainMenu01" play_hold
   spawnscript main_menu_first_frame
 endscript
+
 DoAutoLoad = 1
 ver = ""
 motd = ""
 HudIsOn = 1
 AutoLoadRetryContinueVisible = 0
+
 script ShatterAndDie
   Shatter <...>
   Kill <...>
 endscript
+
 script AutoLoad
   LoadFont "thps4.fnt"
   if PAL
@@ -60,19 +63,23 @@ script AutoLoad
   Change DoAutoLoad = 0
   goto main_menu_first_frame
 endscript
+
 script _ReSpawnAutoload
   EnableBackEvent
   spawnscript AutoLoad
 endscript
+
 script _BackToMainMenuFirstFrame
   EnableBackEvent
   spawnscript BackToMainMenuFirstFrame
 endscript
+
 script BackToMainMenuFirstFrame
   SwitchToMenu menu = frontend_menu DoNotMakeRoot
   Change DoAutoLoad = 0
   goto main_menu_first_frame
 endscript
+
 script main_menu_first_frame
   if istrue run_viewer
     Change DoAutoLoad = 0
@@ -94,6 +101,7 @@ script main_menu_first_frame
     endif
   endif
 endscript
+
 script reset_skateshop_skater
   if CurrentSkaterProfileIs 0
     PlaySkaterCamAnim skater = 0 name = "Cam_MainMenu01" play_hold
@@ -101,9 +109,11 @@ script reset_skateshop_skater
   MakeSkaterGoto skater = 0 SkateShopDummyAI
   MakeSkaterGoto skater = 1 SkateShopDummyAI
 endscript
+
 script exit_main_menu
   UninitializeFrontEndSprites
 endscript
+
 script SkateShopDummyAI
   SwitchOnBoard
   SwitchOffAtomic special_item
@@ -169,6 +179,7 @@ script SkateShopDummyAI
     WaitAnimFinished
   repeat
 endscript
+
 script StandIdle
   begin
     PlayAnim Anim = StandIdle Blendperiod = 0.0
@@ -181,19 +192,23 @@ script StandIdle
     WaitAnimFinished
   repeat
 endscript
+
 script MuskaIdle
   SwitchOnAtomic special_item
   PlayAnim Anim = MuskaIdle Cycle Blendperiod = 0.0 Speed = 0.7
 endscript
+
 script FemaleIdle1
   PlayAnim Anim = FemaleIdle Cycle Blendperiod = 0.0
 endscript
+
 script FemaleIdle2
   PlayAnim Anim = LeanIdle Cycle Blendperiod = 0.0
 endscript
+
 script BoardIdle
   begin
-    PlayAnim random( @Anim = BoardIdle @Anim = BoardIdle @Anim = BoardIdle @Anim = BoardIdle @Anim = BoardIdle @Anim = BoardMove @Anim = BoardLook ) Blendperiod = 0.0
+    PlayAnim Anim = random( @BoardIdle @BoardIdle @BoardIdle @BoardIdle @BoardIdle @BoardMove @BoardLook ) Blendperiod = 0.0
     if CurrentSkaterProfileIs 0
       if AnimEquals BoardMove
       endif
@@ -201,6 +216,7 @@ script BoardIdle
     WaitAnimFinished
   repeat
 endscript
+
 script BoardMove_SFX
   begin
     if FrameIS 30
@@ -213,33 +229,40 @@ script BoardMove_SFX
     Wait 1 Frame
   repeat
 endscript
+
 script OtherIdle
   PlayAnim Anim = StartIdle Cycle Blendperiod = 0.0
 endscript
+
 script DickIdle
   begin
     if AnimEquals DickBeckon
       PlayAnim Anim = DickIdle Blendperiod = 0.0
     else
-      PlayAnim random( @Anim = DickIdle @Anim = DickIdle @Anim = DickBeckon ) Blendperiod = 0.0
+      PlayAnim Anim = random( @DickIdle @DickIdle @DickBeckon ) Blendperiod = 0.0
     endif
     WaitAnimFinished
   repeat
 endscript
+
 script reset_parkeditor_skater
   printf "reset park editor skater"
   MakeSkaterGoto skater = 0 FreezeSkater
   MakeSkaterGoto skater = 1 FreezeSkater
 endscript
+
 script MainMenuCam
   PlaySkaterCamAnim skater = 0 name = "Cam_Default01" play_hold
 endscript
+
 script MainMenuToOptionsCamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_Options01_Anim" play_hold
 endscript
+
 script FrontEndFlash
   DoFlash duration = 1.0 start_r = 255 start_g = 255 start_b = 255 start_a = 255 end_r = 255 end_g = 255 end_b = 255 end_a = 0
 endscript
+
 script OptionsToMainMenuCamAnim
   MoveMenu Id = net_network_setup_menu x = 45
   if istrue ReturnedFromLevelRecords
@@ -248,33 +271,40 @@ script OptionsToMainMenuCamAnim
     PlaySkaterCamAnim skater = 0 name = "Cam_Options01_Back" play_hold
   endif
 endscript
+
 script MainMenuToPlayer1CamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_MainMenu01_Anim" play_hold
   EnableSkaterRotation
   SetCurrentSkaterProfile 0
 endscript
+
 script Player1ToMainMenuCamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_MainMenu01_BackAnim" play_hold
   ResetSkaterRotation
   DisableSkaterRotation
 endscript
+
 script LevelSelectToPlayer1CamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_LevelSelect01_BackAnim" play_hold
 endscript
+
 script Player1ToLevelSelectCamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_LevelSelect01_Anim" play_hold
   BuildCassetteMenu
   killspawnedscript name = WaitThenEnableCassettes
   spawnscript WaitThenEnableCassettes Params = <...>
 endscript
+
 script Player1ToPlayer2CamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_MainMenu02_Anim" play_hold
   ResetSkaterRotation
 endscript
+
 script Player2ToPlayer1CamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_MainMenu02_BackAnim" play_hold
   ResetSkaterRotation
 endscript
+
 script Player2ToLevelSelectCamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_LevelSelect02_Anim" play_hold
   BuildCassetteMenu
@@ -282,23 +312,29 @@ script Player2ToLevelSelectCamAnim
   spawnscript WaitThenEnableCassettes
   DisableSkaterRotation
 endscript
+
 script LevelSelectToPlayer2CamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_LevelSelect02_BackAnim" play_hold
   ResetSkaterRotation
   EnableSkaterRotation
 endscript
+
 script Player1ToBoardShopCamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_BoardSelect01_Anim" play_hold
 endscript
+
 script BoardShopToPlayer1CamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_BoardSelect01_BackAnim" play_hold
 endscript
+
 script Player2ToBoardShopCamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_BoardSelect02_Anim" play_hold
 endscript
+
 script BoardShopToPlayer2CamAnim
   PlaySkaterCamAnim skater = 0 name = "Cam_BoardSelect02_BackAnim" play_hold
 endscript
+
 script WaitThenEnableCassettes
   DisableSkaterRotation
   PollUntilFinished func = SkaterCamAnimHeld skater = 0
@@ -306,6 +342,7 @@ script WaitThenEnableCassettes
     FireMenuEvent Type = MAKECASSETTESFANOUT Id = cassette_menu target = cassette_menu
   endif
 endscript
+
 ShouldShowCareerInfo = 1
 AutoLinkToCareerScreen = 0
 script SetCareerMode
@@ -314,18 +351,21 @@ script SetCareerMode
   MainMenuToPlayer1CamAnim
   Change ShouldShowCareerInfo = 1
 endscript
+
 script SetSingleSessionMode
   SetNetworkMode
   SetGameType SingleSession
   MainMenuToPlayer1CamAnim
   Change ShouldShowCareerInfo = 0
 endscript
+
 script SetFreeSkateMode
   SetNetworkMode
   SetGameType FreeSkate
   MainMenuToPlayer1CamAnim
   Change ShouldShowCareerInfo = 0
 endscript
+
 script SetFreeSkate2pMode
   SetNetworkMode
   SetGameType FreeSkate2p
@@ -334,10 +374,12 @@ script SetFreeSkate2pMode
   SetSkaterRotationPad 0
   SyncPlayer2Profile
 endscript
+
 script SetNetworkPlayMode
   test_network_settings
   Change ShouldShowCareerInfo = 0
 endscript
+
 script Player1ToPlayer2
   Player1ToPlayer2CamAnim
   SetFrontEndPad 1
@@ -346,6 +388,7 @@ script Player1ToPlayer2
   SliderShow
   reload_cas
 endscript
+
 script Player2ToPlayer1
   Player2ToPlayer1CamAnim
   SetFrontEndPad 0
@@ -353,24 +396,30 @@ script Player2ToPlayer1
   SetCurrentSkaterProfile 0
   SliderHide
 endscript
+
 script Player2ToLevelSelect
   UseBothPadsInFrontEnd
   Player2ToLevelSelectCamAnim
 endscript
+
 script Player1ToBoardshop
   Player1ToBoardShopCamAnim
   MakeSkaterGoto MoveToCounter skater = 0
 endscript
+
 script Player2ToBoardshop
   Player2ToBoardShopCamAnim
   MakeSkaterGoto MoveToCounter skater = 1
 endscript
+
 script Player1ToChangeAppearance
   SetCurrentSkaterProfile 0
 endscript
+
 script Player2ToChangeAppearance
   SetCurrentSkaterProfile 1
 endscript
+
 script TutorialLaunch
   SetNetworkMode
   SetGameType FreeSkate
@@ -378,19 +427,23 @@ script TutorialLaunch
   SetCurrentSkaterProfile 0
   LevelSelectStartGame level = Load_Tut
 endscript
+
 script ParkEditorLaunch
   SetFrontEndPad 0
   SetNetworkMode
   AutoLaunch level = custom_park game = parkeditor
 endscript
+
 script player_one_menu_on_show
   SetFrontEndPad 0
   SliderShow
 endscript
+
 script player_two_menu_on_show
   update_pro_display_info <...>
   SliderShow
 endscript
+
 script frontend_menu_on_show
   if CD
     DestroyElement Id = mainmenu_debug
@@ -426,28 +479,37 @@ script frontend_menu_on_show
   AddOption name = "LM_GameOption_bLimitTags" Value = 0
   AddOption name = "LM_GameOption_bGrass" Value = 1
   AddOption name = "LM_DebugOption_bDebugMode" Value = 0
+  AddOption name = "LM_GUI_bTrickNotifications" Value = 1
+  AddOption name = "LM_Control_bWalliePlant" Value = 1
   InitLevelMod
 endscript
+
 script CareerMenuBack
   Player1ToMainMenuCamAnim
 endscript
+
 script free_skate_menu_on_show
   update_pro_display_info <...>
   SliderShow
 endscript
+
 script MenuQuitGame
   QuitGame
 endscript
+
 script single_session_menu_on_show
   update_pro_display_info <...>
   SliderShow
 endscript
+
 script invokeUIScreen
   InvokeScreen <...>
 endscript
+
 script get_version_number
   GetVersionNumber <...>
 endscript
+
 script main_menu_create
   CreateAndAttachMenu { Type = verticalmenu Id = frontend_menu parent = contain1 x = 45.0 y = 90.0 w = 300.0 h = 400.0 just_center_x just_center_y blue_top eventhandler = { Type = showeventhandler target = "frontend_menu_on_show" } children = [ { Type = textmenuelement auto_id text = "Main Menu" static dont_gray drawer = title dont_gray } { Type = textmenuelement auto_id text = "Career" link = career_menu target = "SetCareerMode" } { Type = textmenuelement auto_id text = "Single Session" link = single_session_menu target = "SetSingleSessionMode" } { Type = textmenuelement auto_id text = "Free Skate" link = free_skate_menu target = "SetFreeSkateMode" } { Type = textmenuelement Id = network_play_option text = "Network Play" target = "SetNetworkPlayMode" } { Type = textmenuelement auto_id text = "Create-a-Skater" link = pre_cas_main_menu target = "link_to_cas" } { Type = textmenuelement auto_id text = "Park Editor" target = "ParkEditorLaunch" } { Type = textmenuelement auto_id text = "Tutorials" target = "TutorialLaunch" } { Type = textmenuelement auto_id text = "Options" target = "MainMenuToOptionsCamAnim" link = options_main_menu } { Type = textmenuelement auto_id text = " " x = -45.0 y = 330.0 w = 200 drawer = keyboard_property static dont_gray just_left_x dontdrawrect lock_layout lock_width eventhandler = { Type = showeventhandler target = "get_version_number" } } { Type = textmenuelement auto_id text = motd x = 0.0 y = 300.0 w = 1024 drawer = keyboard_property static dont_gray just_left_x dontdrawrect lock_layout } { Type = textmenuelement auto_id text = "LevelMod 2013-2020" x = 0.0 y = 305.0 w = 580 drawer = keyboard_property static dont_gray dontdrawrect just_right_x just_center_y lock_layout lock_width } { Type = textmenuelement auto_id text = "by DCx Demo*, Vadru'Qc" x = 0.0 y = 330.0 w = 580 drawer = keyboard_property static dont_gray dontdrawrect just_right_x just_center_y lock_layout lock_width } { Type = textmenuelement auto_id text = "Quit" link = menuquitgame_yesno_menu } { Type = textmenuelement Id = mainmenu_debug text = "Debug" link = debug_main_menu } ] }
   CreateAndAttachMenu { Type = verticalmenu Id = menuquitgame_yesno_menu x = 170.0 y = 150.0 w = 300.0 h = 336.0 just_center_x just_center_y blue_top eventhandler = { Type = showeventhandler target = "Select_no" } parent = contain1 children = [ { Type = textmenuelement auto_id text = "Quit?" static dont_gray drawer = title } { Type = textmenuelement Id = quit_yes text = "Yes" target = "MenuQuitGame" } { Type = textmenuelement Id = quit_no text = "No" link = frontend_menu } ] }
@@ -487,6 +549,7 @@ script main_menu_create
   pro_menu_create
   cassette_menu_create
 endscript
+
 script LevelSelectBackOut
   ClearCassetteMenu
   if CurrentSkaterProfileIs 1
@@ -499,10 +562,12 @@ script LevelSelectBackOut
   EnableSkaterRotation
   InitTVScreensVisibility
 endscript
+
 script InitTVScreensVisibility
   invisible prefix = "ss_go_TV_"
   visible name = ss_go_TV_THPScreen
 endscript
+
 script LevelSelectStartGame
   if CurrentSkaterProfileIs 1
     SetGameType trickattack
@@ -513,34 +578,41 @@ script LevelSelectStartGame
   SetSkaterRotationPad 0
   immediately_start_game <...>
 endscript
+
 ParkEditorCassetteTurnRate = -0.05
 script SwitchOffCassetteMenuHeading
   FireMenuEvent Type = HIDE Id = cassette_menu_level_name target = cassette_menu_level_name
   FireMenuEvent Type = HIDE Id = cassette_menu_dummy_line target = cassette_menu_dummy_line
 endscript
+
 script SwitchOnCassetteMenuHeading
   FireMenuEvent Type = SHOW Id = cassette_menu_level_name target = cassette_menu_level_name
   FireMenuEvent Type = SHOW Id = cassette_menu_dummy_line target = cassette_menu_dummy_line
 endscript
+
 script PlayCustomParkFromCassetteMenu
   ClearCassetteMenu
   immediately_start_game <...>
 endscript
+
 script UpdateParkNameInMenuTitles
   GetParkName
   SetMenuElementText Id = cassette_menu_park_editor_menu_title <ParkName>
   SetMenuElementText Id = cassette_menu_dummy_line <ParkName>
 endscript
+
 script cassette_menu_create
   createmenu { Type = cassettemenu Id = cassette_menu eventhandlers = [ { Type = backeventhandler target = "LevelSelectBackOut" } { Type = showeventhandler target = "UpdateParkNameInMenuTitles" } ] AppearanceParams = CassetteMenuParams }
   createmenu { Type = verticalmenu Id = cassette_menu_park_editor_menu x = 255.0 y = 50.0 w = 360.0 h = 230.0 just_center_x just_center_y blue_top eventhandler = { Type = backeventhandler target = "SwitchOnCassetteMenuHeading" } children = [ { Type = textmenuelement Id = cassette_menu_park_editor_menu_title text = " " static dont_gray drawer = title truncate_to_width } { Type = textmenuelement auto_id text = "Play Park" target = "PlayCustomParkFromCassetteMenu" Params = { level = custom_park string = "Play custom park" } } { Type = textmenuelement auto_id text = "Load Custom Park" target = "_CassetteMenuParkEditorLoad" } { Type = textmenuelement auto_id text = "Pre-made parks" link = cassette_menu_parked_load_menu } { Type = textmenuelement auto_id text = "Back" target = "go_back" Params = { Id = cassette_menu_park_editor_menu } } ] }
   attachchild parent = contain1 child = cassette_menu
   attachchild parent = contain1 child = cassette_menu_park_editor_menu
 endscript
+
 script _LoadParkFromDisc
   SwitchOffMenu Id = cassette_menu_parked_load_menu
   spawnscript LoadParkFromDisc Params = <...>
 endscript
+
 script LoadParkFromDisc
   Message_LoadingParkFromDisc
   if ParkEditorCommand command = accessDisk file = <file> DoNotCleanupAndInitialize
@@ -552,6 +624,7 @@ script LoadParkFromDisc
   Wait 0.5 seconds
   SwitchToMenu DoNotMakeRoot menu = cassette_menu_park_editor_menu
 endscript
+
 script ClearCassetteMenu
   DestroyElement Id = cassette_menu_heading
   DestroyElement Id = cassette_menu_goals_left
@@ -584,6 +657,7 @@ script ClearCassetteMenu
   DestroyElement Id = cassette_burnside
   DestroyElement Id = cassette_roswell
 endscript
+
 UnlockRequirements =
 [ { level = LevelNum_Canada 3 Goals } { level = LevelNum_Rio 10 Goals } { level = LevelNum_Suburbia 1 Medal } { level = LevelNum_Airport 18 Goals } { level = LevelNum_SkaterIsland 26 Goals } { level = LevelNum_LA 2 Medals } { level = LevelNum_Tokyo 35 Goals } { level = LevelNum_Ship 3 Medals } ]
 script BuildCassetteMenu
@@ -680,25 +754,31 @@ script BuildCassetteMenu
     endif
   endif
 endscript
+
 script CreateShipCassette
   createmenu { Type = cassettemenuelement Id = cassette_ship ModelName = Ship TVImageName = ss_go_TV_ship LockedTVImageName = ss_go_TV_ship_l LevelName = 'Cruise Ship' LevelNumber = LevelNum_Ship GlobalFlag = LEVEL_UNLOCKED_SHIP GoalParams = DefaultGoalParams eventhandler = { Type = ChooseEventHandler target = "LevelSelectStartGame" kill_menu use_loading_screen Params = { level = Load_Shp } } }
   attachchild child = cassette_ship parent = cassette_menu
 endscript
+
 script CreateWarehouseCassette
   createmenu { Type = cassettemenuelement Id = cassette_warehouse ModelName = Special1_WH TVImageName = ss_go_TV_sp1 LockedTVImageName = ss_go_TV_THPScreen LevelName = 'Warehouse' LevelNumber = LevelNum_Warehouse GlobalFlag = LEVEL_UNLOCKED_WAREHOUSE GoalParams = DefaultGoalParams SpecialLevel eventhandler = { Type = ChooseEventHandler target = "LevelSelectStartGame" kill_menu use_loading_screen Params = { level = Load_Ware } } }
   attachchild child = cassette_warehouse parent = cassette_menu
 endscript
+
 script CreateBurnsideCassette
   createmenu { Type = cassettemenuelement Id = cassette_burnside ModelName = Special2_BS TVImageName = ss_go_TV_sp2 LockedTVImageName = ss_go_TV_THPScreen LevelName = 'Burnside' LevelNumber = LevelNum_Burnside GlobalFlag = LEVEL_UNLOCKED_BURNSIDE GoalParams = DefaultGoalParams SpecialLevel eventhandler = { Type = ChooseEventHandler target = "LevelSelectStartGame" kill_menu use_loading_screen Params = { level = Load_Burn } } }
   attachchild child = cassette_burnside parent = cassette_menu
 endscript
+
 script CreateRoswellCassette
   createmenu { Type = cassettemenuelement Id = cassette_roswell ModelName = Special3_ros TVImageName = ss_go_TV_sp3 LockedTVImageName = ss_go_TV_THPScreen LevelName = 'Roswell' LevelNumber = LevelNum_Roswell GlobalFlag = LEVEL_UNLOCKED_ROSWELL GoalParams = DefaultGoalParams SpecialLevel eventhandler = { Type = ChooseEventHandler target = "LevelSelectStartGame" kill_menu use_loading_screen Params = { level = Load_Ros } } }
   attachchild child = cassette_roswell parent = cassette_menu
 endscript
+
 script PositionStatPips
   MoveMenu Id = cassette_menu_stat_points_pips x = 430 y = 80 w = 70 h = 23
 endscript
+
 CassetteMenuParams =
 { SourceNodeName = TRG_Videxplode NumFramesToFanOut = 20 FanOutPause = 1 NumFramesToFanIn = 20 FanInPause = 1 NumVisible = 6 XSeparation = 90 NumFramesToMoveSideways = 10 YCoord = 330 UnselectedZ = 40 SelectedZ = 20 NumFramesToFlip = 50 BigX = 320 BigY = 240 BigZ = 5 NumFramesToGetBig = 20 }
 GoalInfoTopY = 60
@@ -724,6 +804,7 @@ script CareerMenuShow
   UpdateCareerInfoMenu
   spawnscript MaybeWhizz
 endscript
+
 script MaybeWhizz
   if ControllerPressed Left
     MoveMenu Id = career_info x = 45
@@ -735,9 +816,11 @@ script MaybeWhizz
     endif
   endif
 endscript
+
 script CareerMenuBackOut
   FireMenuEvent Type = HIDE Id = career_info target = career_info
 endscript
+
 script SetDefaultSliderPos
   if CurrentSkaterProfileIs 1
     MoveMenu Id = slider_info x = 295
@@ -745,6 +828,7 @@ script SetDefaultSliderPos
     MoveMenu Id = slider_info x = 45
   endif
 endscript
+
 script SliderShow
   SetDefaultSliderPos
   if menuisshown pro_menu
@@ -759,6 +843,7 @@ script SliderShow
   UpdateSliderInfoMenu
   spawnscript SliderMaybeWhizz
 endscript
+
 script SliderMaybeWhizz
   if ControllerPressed Left
     SetDefaultSliderPos
@@ -775,9 +860,11 @@ script SliderMaybeWhizz
     endif
   endif
 endscript
+
 script SliderHide
   FireMenuEvent Type = HIDE Id = slider_info target = slider_info
 endscript
+
 TotalGoals = 54
 IconColor_Gold = { r = 234 g = 190 b = 92 a = 115 }
 IconColor_Silver = { r = 167 g = 225 b = 236 a = 115 }
@@ -788,3 +875,4 @@ RightArrowIconElement = { Type = iconmenuelement image = "panelsprites\arrow_men
 script attach_back_button
   CreateAndAttachMenu { Type = textmenuelement auto_id parent = <menu_id> text = "Back" target = "go_back" Params = { Id = <menu_id> } }
 endscript
+
