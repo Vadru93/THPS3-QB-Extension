@@ -229,118 +229,148 @@ SCRIPT LM_SetOption
 ENDSCRIPT
 
 //a generic toggle func to take option, item id and on off text
-
 SCRIPT LM_ToggleOption 
-    //Check if this is the top item
-    IF LM_GotParam auto_id
-	    printf "LevelModSettings"
+	//Check if this is the top item
+	IF LM_GotParam auto_id
+	 printf "LevelModSettings"
 	ELSE
 	
-	    //Is this a special menu?
-	    IF LM_GotParam link
-		    //Todo handle linked menus
+		//Is this a special menu?
+		IF LM_GotParam link
+			//Todo handle linked menus
 		ELSE
-	        printf "called LM_ToggleOption"
-	
-	        //only toggles the value if asked by global
-	        IF GotParam Toggle
-	            printf "Toggle"
-		        ToggleOption <name>
-	        ENDIF
-	
-	        //update text if we have item id
-		    //We need to use LM_GotParam because our param is inside a struct
-		    //And the normal GotParam function can't find it
-	        IF LM_GotParam id
-		        //GetParam will move the param from the struct to the script stack
-	            GetParam id
-		        GetParam name
-				
-		        IF IsOptionOn <name>
-		            GetParam on
-			        SetMenuElementText id = <id> <on>
-			        printf "on"
-		        ELSE
-		            GetParam off
-			        SetMenuElementText id = <id> <off>
-			        printf "off"
-		        ENDIF
-	         ELSE
-		        printf "without menu id!"
-	        ENDIF
-        ENDIF
+			printf "called LM_ToggleOption"
+		
+			//give textonly param if we only want to update text
+			IF #"Not" GotParam TextOnly
+				printf "Toggle"
+				ToggleOption <name>
+			ENDIF
+			
+			//update text if we have item id
+			//We need to use LM_GotParam because our param is inside a struct
+			//And the normal GotParam function can't find it
+			IF LM_GotParam id
+			
+				//GetParam will move the param from the struct to the script stack
+				GetParam id
+				GetParam name
+
+				IF IsOptionOn <name>
+				GetParam on
+					SetMenuElementText id = <id> <on>
+					printf "on"
+				ELSE
+				GetParam off
+					SetMenuElementText id = <id> <off>
+					printf "off"
+				ENDIF
+			ELSE
+				printf "without menu id!"
+			ENDIF
+		ENDIF
 	ENDIF
 ENDSCRIPT
 
 
-//the apparently failed attempt to call func passing the params from params = { smth } to use smth as global
-SCRIPT CallToggle
-  LM_ToggleOption <params>
-ENDSCRIPT
-
-
-//intented to loop through list items and 
+//intented to loop through list items and update item text based on selected option
 SCRIPT UpdateMenuText
-	printf "am i even called? UpdateMenuText"
-	Foreachin <children> do = CallToggle params = <...>
-	printf "done"
+	ForEachIn <children> do = LM_ToggleOption params = { <...> TextOnly }
+	printf "menu text init done"
 ENDSCRIPT
+
 
 //levelmod menu struct
 LevelMod_menu = { 
-		Type = verticalmenu 
-		id = menu_levelmod_settings 
-		x = 170.0 y = 90.0 w = 300.0 h = 400.0 
-		just_center_x just_center_y blue_top 
-		eventhandler = { 
-			Type = showeventhandler 
-			target = "UpdateMenuText" 
-			params = LevelMod_menu
-		} 
-		children = levelmod_menu_items
+	Type = scrollingmenu 
+	id = menu_levelmod_settings 
+	children = levelmod_menu_items
+	num_visible = 13
+	x = 170.0 y = 90.0 w = 300.0 h = 400.0 
+	just_center_x just_center_y blue_top 
+	eventhandler = { 
+		Type = showeventhandler 
+		target = "UpdateMenuText" 
+		params = LevelMod_menu
 	}
+}
+
+//shared options for a bool menu item
+LM_Menu_Shared_Bool = {	
+	Type = textmenuelement 
+	text = "Foo"
+	target = "LM_ToggleOption"
+}
 
 levelmod_menu_items = [ 
-			{ Type = textmenuelement auto_id text = "LevelMod Settings" static dont_gray drawer = title }
-{ Type = textmenuelement id = LM_Control_bRevert_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_Control_bRevert Toggle id = LM_Control_bRevert_id on = "Reverts: on" off = "Reverts: off" } }
-		//Sets spine button
-		//0 = Revert
-		//1 = Nollie
-		//2 = SpinLeft
-		//3 = SpinRight
-		//4 = Revert+Nollie
-		//5 = SpinLeft+SpinRight
-		{ Type = textmenuelement id = LM_Control_SpineButton_id text = "Foo" link = "spine_button_menu" params = { name = LM_Control_SpineButton id = LM_Control_SpineButton_id  } }	
-		{ Type = textmenuelement id = LM_Control_bNewTricks_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_Control_bNewTricks Toggle id = LM_Control_bNewTricks_id on = "New Tricks: on" off = "New Tricks: off" } }
-		//Set the airtrick speed
-		//0 = normal
-		//1 = THPS4
-		//2 = Fast 1
-		{ Type = textmenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id normal = "AirTrickSpeed: Normal" thsp4 = "AirTrickSpeed: THPS4" fast = "AirTrickSpeed: Fast" } }
-		{ Type = textmenuelement id = LM_GUI_bShowHud_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_GUI_bShowHud Toggle id = LM_GUI_bShowHud_id on = "ShowHUD: on" off = "ShowHUD: off" } }
-        //The new LevelMod menu when you press esc
-		{ Type = textmenuelement id = LM_GUI_bNewMenu_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_GUI_bNewMenu Toggle id = LM_GUI_bNewMenu_id on = "New Menu: on" off = "New Menu: off" } }
-        //This counts your tags
-		//currently only works coreclty when you play alone
-		{ Type = textmenuelement id = LM_GUI_bShowGrafCounter_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_GUI_bShowGrafCounter Toggle id = LM_GUI_bShowGrafCounter_id on = "GrafCounter: on" off = "GrafCounter: off" } }
-		//This fixes Sk3_TeleportToNode
-		//So that skater will have same orientation when it leave the teleport
-		//As when it entered the teleport
-		{ Type = textmenuelement id = LM_BugFix_bTeleFix_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_BugFix_bTeleFix Toggle id = LM_BugFix_bTeleFix_id on = "TeleFix: on" off = "TeleFix: off" } }
-	    { Type = textmenuelement id = LM_GameOption_bLimitTags_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_GameOption_bLimitTags Toggle id = LM_GameOption_bLimitTags_id off = "Unlimited Tags: on" on = "Unlimited Tags: off" } }
-		{ Type = textmenuelement id = LM_GameOption_bGrass_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_GameOption_bGrass Toggle id = LM_GameOption_bGrass_id on = "3D Grass: on" off = "3D Grass: off" } }
-		//restart required for this option to apply
-		{ Type = textmenuelement id = LM_DebugOption_bDebugMode_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_DebugOption_bDebugMode Toggle id = LM_DebugOption_bDebugMode_id on = "Debug Mode: on" off = "Debug Mode: off" } }
-		//restart required for this option to apply
-		{ Type = textmenuelement id = LM_Control_bXinput_id text = "Foo" target = "LM_ToggleOption" params = { name = LM_Control_bXinput Toggle id = LM_Control_bXinput_id on = "Xinput: on" off = "Xinput: off" } }
-			//{ Type = textmenuelement id = tele_fix text = "Foo" target = "sToggleTeleFix" }
-			//{ Type = textmenuelement id = sound_fix text = "Foo" target = "sToggleSoundFix" }
-			//{ Type = textmenuelement id = tag_fix text = "Foo" target = "sToggleTagLimit" }
-			//{ Type = textmenuelement id = grass_3d text = "Foo" target = "sToggle3DGrass" }
-			//{ Type = textmenuelement id = print_debug text = "Foo" target = sTogglePrintDebug }
-			//{ Type = textmenuelement id = show_console text = "Foo" target = sToggleShowConsole }
-			//{ Type = textmenuelement id = spine_button text = "Spine Button" link = spine_button_menu } 
-		] 
+	{ Type = textmenuelement auto_id text = "LevelMod settings" static dont_gray drawer = title }
+	
+	//option to disable revert chain
+	{ LM_Menu_Shared_Bool id = LM_Control_bRevert_id params = { name = LM_Control_bRevert id = LM_Control_bRevert_id on = "Reverts: on" off = "Reverts: off" } }
+	
+	//option to disable wallieplant chain
+	{ LM_Menu_Shared_Bool id = LM_Control_bWalliePlant_id params = { name = LM_Control_bWalliePlant id = LM_Control_bWalliePlant_id on = "Wallieplant: on" off = "Wallieplant: off" } }
+	
+	//option to remove annoying messages
+	{ LM_Menu_Shared_Bool id = LM_GUI_bTrickNotifications_id params = { name = LM_GUI_bTrickNotifications id = LM_GUI_bTrickNotifications_id on = "Extra Messages: on" off = "Extra Messages: off" } }
+	
+	//Sets spine button
+	//0 = Revert
+	//1 = Nollie
+	//2 = SpinLeft
+	//3 = SpinRight
+	//4 = Revert+Nollie
+	//5 = SpinLeft+SpinRight
+	{ Type = textmenuelement id = LM_Control_SpineButton_id text = "Foo" link = "spine_button_menu" params = { name = LM_Control_SpineButton id = LM_Control_SpineButton_id } }	
+	
+	//new tricks?
+	{ LM_Menu_Shared_Bool id = LM_Control_bNewTricks_id params = { name = LM_Control_bNewTricks id = LM_Control_bNewTricks_id on = "New Tricks: on" off = "New Tricks: off" } }
+	
+	//Set the airtrick speed
+	//0 = normal
+	//1 = THPS4
+	//2 = Fast 1
+	{ Type = textmenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id normal = "AirTrickSpeed: Normal" thsp4 = "AirTrickSpeed: THPS4" fast = "AirTrickSpeed: Fast" } }
+	
+	//disables HUD completely, "pro" mode, "screenshot" mode
+	{ LM_Menu_Shared_Bool id = LM_GUI_bShowHud_id params = { name = LM_GUI_bShowHud id = LM_GUI_bShowHud_id on = "ShowHUD: on" off = "ShowHUD: off" } }
+ 
+	 //The new LevelMod menu when you press esc
+	{ LM_Menu_Shared_Bool id = LM_GUI_bNewMenu_id params = { name = LM_GUI_bNewMenu id = LM_GUI_bNewMenu_id on = "New Menu: on" off = "New Menu: off" } }
+	
+	//This counts your tags
+	//currently only works coreclty when you play alone
+	{ LM_Menu_Shared_Bool id = LM_GUI_bShowGrafCounter_id params = { name = LM_GUI_bShowGrafCounter id = LM_GUI_bShowGrafCounter_id on = "GrafCounter: on" off = "GrafCounter: off" } }
+		
+	//This fixes Sk3_TeleportToNode
+	//So that skater will have same orientation when it leave the teleport
+	//As when it entered the teleport
+	{ LM_Menu_Shared_Bool id = LM_BugFix_bTeleFix_id params = { name = LM_BugFix_bTeleFix id = LM_BugFix_bTeleFix_id on = "TeleFix: on" off = "TeleFix: off" } }
+	
+	//removes 32 tags limit
+	{ LM_Menu_Shared_Bool id = LM_GameOption_bLimitTags_id params = { name = LM_GameOption_bLimitTags id = LM_GameOption_bLimitTags_id off = "Unlimited Tags: on" on = "Unlimited Tags: off" } }
+	
+	//enables pseudo 3d layered grass in t2x and th4 levels
+	{ LM_Menu_Shared_Bool id = LM_GameOption_bGrass_id params = { name = LM_GameOption_bGrass id = LM_GameOption_bGrass_id on = "3D Grass: on" off = "3D Grass: off" } }
+	
+	//enables debug console, restart required for this option to apply
+	{ LM_Menu_Shared_Bool id = LM_DebugOption_bDebugMode_id params = { name = LM_DebugOption_bDebugMode id = LM_DebugOption_bDebugMode_id on = "Debug Mode: on" off = "Debug Mode: off" } }
+
+	//enables XInput support, restart required for this option to apply
+	{ LM_Menu_Shared_Bool id = LM_Control_bXinput_id params = { name = LM_Control_bXinput id = LM_Control_bXinput_id on = "Xinput: on" off = "Xinput: off" } }
+	
+	//goes back to previous menu
+	{ Type = textmenuelement id = levelmod_options_done text = "Back" target = "go_back" Params = { id = menu_levelmod_settings } } 
+	
+	//old options
+	//{ Type = textmenuelement id = tele_fix text = "Foo" target = "sToggleTeleFix" }
+	//{ Type = textmenuelement id = sound_fix text = "Foo" target = "sToggleSoundFix" }
+	//{ Type = textmenuelement id = tag_fix text = "Foo" target = "sToggleTagLimit" }
+	//{ Type = textmenuelement id = grass_3d text = "Foo" target = "sToggle3DGrass" }
+	//{ Type = textmenuelement id = print_debug text = "Foo" target = sTogglePrintDebug }
+	//{ Type = textmenuelement id = show_console text = "Foo" target = sToggleShowConsole }
+	//{ Type = textmenuelement id = spine_button text = "Spine Button" link = spine_button_menu } 
+] 
 
 SCRIPT options_menu_create
 	CreateMenu { Type = verticalmenu id = options_main_menu x = 170.0 y = 90.0 w = 300.0 h = 400.0 just_center_x just_center_y blue_top eventhandlers = [ { Type = backeventhandler target = "OptionsToMainMenuCamAnim" }
@@ -360,7 +390,7 @@ SCRIPT options_menu_create
 	//adds levelmod menu
 	CreateMenu { LevelMod_menu }
 	AttachChild parent = contain1 child = menu_levelmod_settings
-	
+
 	CreateMenu { Type = verticalmenu id = spine_button_menu x = 170.0 y = 90.0 w = 300.0 h = 400.0 just_center_x just_center_y blue_top children = [ { Type = textmenuelement auto_id text = "Spine Button" static dont_gray drawer = title }
 			{ Type = textmenuelement auto_id text = "Revert" target = "SetSpineButton" link = menu_levelmod_settings Params = { revert } }
 			{ Type = textmenuelement auto_id text = "Nollie" target = "SetSpineButton" link = menu_levelmod_settings Params = { nollie } }
