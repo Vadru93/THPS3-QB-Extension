@@ -279,7 +279,7 @@ SCRIPT Trick_WallPlant
 	InAirExceptions
 	Vibrate Actuator = 1 Percent = 50 Duration = 0.1
 	PlayAnim Anim = Boneless BlendPeriod = 0.0
-	SetTrickName "Wallplant"
+	SetTrickName "Wallieplant"
 	SetTrickScore 500
 	Display
 	#"Jump" BonelessHeight
@@ -297,6 +297,11 @@ ENDSCRIPT
 
 SCRIPT Wallie
 	InAirExceptions
+	//this is needed here to skip to wallieplant if it's in chain. else it awards 2 tricks.
+	//can we let it be here with wallieplant disabled?
+	IF IsOptionOn LM_Control_bWalliePlant	
+		DoNextTrick
+	ENDIF
 	Vibrate Actuator = 1 Percent = 50 Duration = 0.1
 	PlayAnim Anim = Ollie BlendPeriod = 0.0
 	SetTrickName "Wallie"
