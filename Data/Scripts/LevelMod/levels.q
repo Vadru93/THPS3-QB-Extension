@@ -887,6 +887,7 @@ SCRIPT Load_Level_Func {
 	ENDIF
 
 	sky_path change Sky
+	printf "Loading Geometry..."
 	LoadLevelGeometry { level = <lev_bsp> Sky = <lev_sky> }
 	
 	IF InNetGame
@@ -898,7 +899,7 @@ SCRIPT Load_Level_Func {
 			LoadLevelGeometry { Sky = "" }
 		ENDIF
 	ENDIF
-	
+	printf "Loading NodeArray"
 	LoadNodeArray { <lev_qb> }
 	LoadTerrain
 	
