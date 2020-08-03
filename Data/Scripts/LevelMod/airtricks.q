@@ -685,7 +685,9 @@ script CalledOllie
 		ClearException Ollied
 	else
 		#"Jump"
-		ClearException Ollied
+		IF #"Not" IsOptionOn LM_Control_bButtSlap
+		    ClearException Ollied
+		ENDIF
 	endif
 endscript
 

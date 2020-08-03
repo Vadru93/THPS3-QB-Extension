@@ -47,6 +47,8 @@ SCRIPT AddOptions
 	AddOption name = "LM_DebugOption_bDebugMode" Value = 0
 	AddOption name = "LM_GUI_bTrickNotifications" Value = 1
 	AddOption name = "LM_Control_bWalliePlant" Value = 1
+	AddOption name = "LM_Control_bButtSlap" value = 1
+	AddOption name = "LM_Control_bBoostPlant" value = 0
 ENDSCRIPT
  
 SCRIPT LM_SetOption
@@ -266,7 +268,12 @@ levelmod_menu_control_items = [
 	
 	//option to disable wallieplant chain
 	{ LM_Menu_Shared_Bool id = LM_Control_bWalliePlant_id params = { name = LM_Control_bWalliePlant id = LM_Control_bWalliePlant_id on = "Wallieplant: on" off = "Wallieplant: off" } }
-
+	//option to disable wallieplant boostplant
+	{ LM_Menu_Shared_Bool id = LM_Control_bBoostPlant_id params = { name = LM_Control_bBoostPlant id = LM_Control_bBoostPlant_id on = "Boostplant: on" off = "Boostplant: off" } }
+	
+	//option to disable buttslap
+    { LM_Menu_Shared_Bool id = LM_Control_bButtSlap_id params = { name = LM_Control_bButtSlap id = LM_Control_bButtSlap_id on = "Buttslap: on" off = "Buttslap: off" } }
+	
 	//Sets spine button
 	//0 = Revert
 	//1 = Nollie
