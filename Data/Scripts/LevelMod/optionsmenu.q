@@ -242,13 +242,6 @@ SCRIPT options_menu_create
 
 	//adds levelmod menu
 	CreateLevelModMenus
-
-	CreateMenu { Type = verticalmenu id = spine_button_menu x = 170.0 y = 90.0 w = 300.0 h = 400.0 just_center_x just_center_y blue_top children = [ { Type = textmenuelement auto_id text = "Spine Button" static dont_gray drawer = title }
-			{ Type = textmenuelement auto_id text = "Revert" target = "SetSpineButton" link = menu_levelmod_settings Params = { revert } }
-			{ Type = textmenuelement auto_id text = "Nollie" target = "SetSpineButton" link = menu_levelmod_settings Params = { nollie } }
-			{ Type = textmenuelement auto_id text = "Left Spin Button" target = "SetSpineButton" link = menu_levelmod_settings Params = { LeftSpin } }
-			{ Type = textmenuelement auto_id text = "Right Spin Button" target = "SetSpineButton" link = menu_levelmod_settings Params = { RightSpin } } ] }
-	attachchild parent = contain1 child = spine_button_menu
 	CreateMenu { Type = verticalmenu id = palmer_warning x = 130.0 y = 120.0 w = 380.0 h = 400.0 just_center_x just_center_y blue_top eventhandler = { Type = showeventhandler target = "Palmer_ShowEvent" } children = [ { Type = textmenuelement auto_id text = "Warning!" static dont_gray drawer = title }
 			{ Type = textmenuelement auto_id text = "You will lose any" static dont_gray }
 			{ Type = textmenuelement auto_id text = "unsaved THPS3 changes" static dont_gray }

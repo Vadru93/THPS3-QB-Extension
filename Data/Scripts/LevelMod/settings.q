@@ -15,6 +15,19 @@ SCRIPT CreateLevelModMenus
 	//adds levelmod menu
 	CreateMenu { LevelMod_menu_GameOptions }
 	AttachChild parent = contain1 child = menu_levelmod_GameOptions
+	
+	
+		
+	CreateMenu { Type = verticalmenu id = spine_button_menu x = 170.0 y = 90.0 w = 300.0 h = 400.0 just_center_x just_center_y blue_top children = [ { Type = textmenuelement auto_id text = "Spine Button" static dont_gray drawer = title }
+			{ Type = textmenuelement auto_id text = "Revert" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 0 TextFromValue = LM_Control_SpineButton_Text } }
+			{ Type = textmenuelement auto_id text = "Nollie" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 1 TextFromValue = LM_Control_SpineButton_Text } }
+			{ Type = textmenuelement auto_id text = "Left Spin Button" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 2 TextFromValue = LM_Control_SpineButton_Text } }
+			{ Type = textmenuelement auto_id text = "Right Spin Button" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 3 TextFromValue = LM_Control_SpineButton_Text } } 
+			{ Type = textmenuelement auto_id text = "Revert + Nollie" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 4 TextFromValue = LM_Control_SpineButton_Text } } 
+			{ Type = textmenuelement auto_id text = "Both Spin Buttons" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 5 TextFromValue = LM_Control_SpineButton_Text } } ] }
+	attachchild parent = contain1 child = spine_button_menu
+	
+
 ENDSCRIPT
 
 SCRIPT AddOptions
@@ -57,18 +70,29 @@ SCRIPT LM_SetOption
 		GetParam name
 		GetParam id
 		printf "Going to set option"
-		IF GotParam TextOnly
+		IF LM_GotParam TextOnly
 			GetParam TextFromValue
 			GetOptionText option = <name> text = <TextFromValue>
 			printf "setting menu element text"
 			SetMenuElementText id = <id> <text>
 		ELSE
-			IF SetOption <name>
-				printf "Getting option text"
-				GetParam TextFromValue
-				GetOptionText option = <name> text = <TextFromValue>
-				printf "setting menu element text"
-				SetMenuElementText id = <id> <text>
+		    IF LM_GotParam Value
+			    GetParam Value
+				//Sets option from value
+				IF SetOption <name> value = <Value>
+				     GetParam TextFromValue
+					 GetOptionText option = <name> text = <TextFromValue>
+					 SetMenuElementText id = <id> <text>
+				ENDIF
+			ELSE
+			    //Sets option from slider
+				IF SetOption <name>
+					printf "Getting option text"
+					GetParam TextFromValue
+					GetOptionText option = <name> text = <TextFromValue>
+					printf "setting menu element text"
+					SetMenuElementText id = <id> <text>
+				ENDIF
 			ENDIF
 		ENDIF
 		printf "DONE"
@@ -84,6 +108,15 @@ LM_Control_AirTrickSpeed_Text = [
 	"20 percent faster"
 ]
 
+LM_Control_SpineButton_Text = [
+"Revert"
+"Nollie"
+"SpinLeft"
+"SpinRight"
+"Revert+Nollie"
+"SpinLeft+SpinRight"
+]
+
 //a generic toggle func to take option, item id and on off text
 SCRIPT LM_ToggleOption 
 	//Check if this is the top item
@@ -94,6 +127,8 @@ SCRIPT LM_ToggleOption
 		//Is this a special menu?
 		IF LM_GotParam link
 			//Todo handle linked menus
+			
+			
 		ELSE
 			printf "called LM_ToggleOption"
 		
@@ -110,11 +145,18 @@ SCRIPT LM_ToggleOption
 			
 				//GetParam will move the param from the struct to the script stack
 				GetParam id
-				GetParam name
+				IF LM_GotParam name
+				    GetParam name
+				ENDIF
 				IF LM_GotParam TextFromValue
 					printf "Updating TextFromValue"
 					GetParam TextFromValue
-					GetOptionText option = <name> text = <TextFromValue>
+					IF LM_GotParam option
+					    GetParam option
+					    GetOptionText option = <option> text = <TextFromValue>
+					ELSE
+					    GetOptionText option = <name> text = <TextFromValue>
+					ENDIF
 					SetMenuElementText id = <id> <text>
 				ELSE
 					IF IsOptionOn <name>
@@ -281,7 +323,8 @@ levelmod_menu_control_items = [
 	//3 = SpinRight
 	//4 = Revert+Nollie
 	//5 = SpinLeft+SpinRight
-	{ Type = textmenuelement id = LM_Control_SpineButton_id text = "Foo" link = "spine_button_menu" params = { name = LM_Control_SpineButton id = LM_Control_SpineButton_id } }	
+	{ Type = textmenuelement id = LM_Control_SpineButton_id text = "Spine Button" link = spine_button_menu params = { name = LM_Control_SpineButton id = LM_Control_SpineButton_id } }	
+	{ Type = textmenuelement id = SpineButtonText_id text = "Foo" static dont_gray drawer = keyboard_property params = { id = SpineButtonText_id TextFromValue = LM_Control_SpineButton_Text name = LM_Control_SpineButton } }
 	
 	//new tricks?
 	{ LM_Menu_Shared_Bool id = LM_Control_bExtraTricks_id params = { name = LM_Control_bExtraTricks id = LM_Control_bExtraTricks_id on = "Extra tricks: on" off = "Extra tricks: off" } }
@@ -293,7 +336,7 @@ levelmod_menu_control_items = [
 	//0 = normal
 	//1 = THPS4
 	//2 = Fast 1
-	{ Type = slidermenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" lower = 0 upper = 4 delta = 1 start = 0 wrap = 0 right_side_w = 80 eventhandlers = [ {Type = showeventhandler target = "LM_SetOption" id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text TextOnly}{ Type = ContentsChangedEventHandler target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text} } ] }
+	{ Type = slidermenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" lower = 0 upper = 4 delta = 1 start = 0 wrap = 0 right_side_w = 80 eventhandlers = [ {Type = showeventhandler target = "LM_SetOption" params = { id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text TextOnly } }{ Type = ContentsChangedEventHandler target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text} } ] }
 	
 	//enables XInput support, restart required for this option to apply
 	{ LM_Menu_Shared_Bool id = LM_Control_bXinput_id params = { name = LM_Control_bXinput id = LM_Control_bXinput_id on = "Xinput: on" off = "Xinput: off" } }
