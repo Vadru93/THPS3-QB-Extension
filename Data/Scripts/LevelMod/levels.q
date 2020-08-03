@@ -387,7 +387,7 @@ SCRIPT Load_Rio
 	AddMusicTrack "ambience\rio"
 	SetUpRioDeJaneiroLights
 	Load_Level_Func lev_bsp = "Levels\rio\rio.bsp" lev_sky = "Levels\rio_Sky\rio_Sky.bsp" lev_qb = "Levels\rio\rio.qb" lev_scr = Rio
-	CareerStartLevel level = LevelNum_Rio
+	CareerStartLevel level = LevelNum_Rio competition
 	PrepareLevelFog r = 145 g = 201 b = 242 a = 0 cnear = 13 cfar = 30000
 	SetMovementVelocity 2000
 	SetRotateVelocity 120
@@ -431,7 +431,7 @@ SCRIPT Load_Tok
 	AddMusicTrack "ambience\tok"
 	SetUpTokyoLights
 	Load_Level_Func lev_bsp = "Levels\tok\tok.bsp" lev_sky = "Levels\tok_Sky\tok_Sky.bsp" lev_qb = "Levels\tok\tok.qb" lev_scr = Tokyo
-	CareerStartLevel level = LevelNum_Tokyo
+	CareerStartLevel level = LevelNum_Tokyo competition
 	PrepareLevelFog r = 16 g = 17 b = 26 a = 0 cnear = 13 cfar = 17000
 	SetMovementVelocity 1000
 	SetRotateVelocity 120
@@ -842,35 +842,24 @@ SCRIPT Load_ST_ug2
 ENDSCRIPT
 
 
-
-SCRIPT TestNoParam
-	PlaySound <...>
-ENDSCRIPT
-
-
-SCRIPT Load_Level_Func { 
-	levelnum = LevelNum_New 
-	lev_bsp = "" 
-	lev_sky = "" 
-	lev_qb = "" 
-	lev_scr = Foundry 
-	r = 128 b = 128 b = 128 a = 128 
-	cnear = 12 cfar = 20000 
-}
-
+//don't think default params are actually needed
+//if it crashes, fix the struct. we don't want to like load foundry if something's wrong.
+SCRIPT Load_Level_Func 
 	DisplayProperLoadingScreen <lev_scr>
 
 	IF GotParam lev_amb
-		AddMusicTrack { <lev_amb> }
+		AddMusicTrack <lev_amb>
 	ENDIF
 
-	//ChangeParamToUnnamed function = TestNoParam param = snd
-	
-	//wonder if need outside career mode
-	//this sets levelnum, so bails check doesnt work. IF is needed.
-	//IF IsCareerMode
-		CareerStartLevel { level = <levelnum> }
-	//ENDIF
+	//this sets levelnum for career mode, so bails check doesnt work if skipped
+	//make sure levelnum = LevelNum_New is set for levelmod levels
+	IF GotParam levelnum
+		IF GotParam competition
+			CareerStartLevel { level = <levelnum> competition }
+		ELSE
+			CareerStartLevel { level = <levelnum> }
+		ENDIF
+	ENDIF
 
 	sky_path change Sky
 	printf "Loading Geometry..."
@@ -885,8 +874,9 @@ SCRIPT Load_Level_Func {
 			LoadLevelGeometry { Sky = "" }
 		ENDIF
 	ENDIF
+	
 	printf "Loading NodeArray"
-	LoadNodeArray { <lev_qb> }
+	LoadNodeArray <lev_qb>
 	LoadTerrain
 	
 	SetBackgroundColor <...>
