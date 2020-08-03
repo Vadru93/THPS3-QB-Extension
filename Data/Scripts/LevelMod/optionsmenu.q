@@ -224,9 +224,28 @@ ENDSCRIPT
 
 
 //==================levelmod options shtuff ============================
-
 SCRIPT LM_SetOption
+printf "Setting option"
+    IF LM_GotParam name
+        GetParam name
+		GetParam id
+		printf "Going to set option"
+        IF SetOption <name>
+		    printf "Getting option text"
+			GetParam TextFromValue
+	        GetOptionText option = <name> text = <TextFromValue>
+		    printf "setting menu element text"
+		    SetMenuElementText id = <id> <text>
+		ENDIF
+		printf "DONE"
+    ENDIF
 ENDSCRIPT
+
+LM_Control_AirTrickSpeed_Text = [
+"Normal"
+"THPS4"
+"Fast Air"
+]
 
 //a generic toggle func to take option, item id and on off text
 SCRIPT LM_ToggleOption 
@@ -255,15 +274,21 @@ SCRIPT LM_ToggleOption
 				//GetParam will move the param from the struct to the script stack
 				GetParam id
 				GetParam name
-
-				IF IsOptionOn <name>
-				GetParam on
-					SetMenuElementText id = <id> <on>
-					printf "on"
+                IF LM_GotParam TextFromValue
+				    printf "Updating TextFromValue"
+					GetParam TextFromValue
+                    GetOptionText option = <name> text = <TextFromValue>
+					SetMenuElementText id = <id> <text>
 				ELSE
-				GetParam off
-					SetMenuElementText id = <id> <off>
-					printf "off"
+		            IF IsOptionOn <name>
+		                GetParam on
+			            SetMenuElementText id = <id> <on>
+			            printf "on"
+		            ELSE
+		                GetParam off
+			            SetMenuElementText id = <id> <off>
+			            printf "off"
+		            ENDIF
 				ENDIF
 			ELSE
 				printf "without menu id!"
@@ -330,7 +355,7 @@ levelmod_menu_items = [
 	//0 = normal
 	//1 = THPS4
 	//2 = Fast 1
-	{ Type = textmenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id normal = "AirTrickSpeed: Normal" thsp4 = "AirTrickSpeed: THPS4" fast = "AirTrickSpeed: Fast" } }
+	{ Type = slidermenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" lower = 0 upper = 2 delta = 1 start = 0 wrap = 0 right_side_w = 80 eventhandlers = [ { Type = ContentsChangedEventHandler target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text} } ] }
 	
 	//disables HUD completely, "pro" mode, "screenshot" mode
 	{ LM_Menu_Shared_Bool id = LM_GUI_bShowHud_id params = { name = LM_GUI_bShowHud id = LM_GUI_bShowHud_id on = "ShowHUD: on" off = "ShowHUD: off" } }
