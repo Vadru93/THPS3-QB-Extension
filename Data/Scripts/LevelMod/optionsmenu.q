@@ -242,9 +242,9 @@ printf "Setting option"
 ENDSCRIPT
 
 LM_Control_AirTrickSpeed_Text = [
-"Normal"
-"THPS4"
-"Fast Air"
+"Normal Trick Speed"
+"THPS4 Trick Speed"
+"Fast Air Trick Speed"
 ]
 
 //a generic toggle func to take option, item id and on off text
