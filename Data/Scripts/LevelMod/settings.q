@@ -33,6 +33,8 @@ SCRIPT AddOptions
 	//0 = Normal speed
 	//1 = Th4 Speed
 	//2 = Fast Air Speed
+	//3 = 10% faster
+	//4 = 20% faster
 	AddOption name = "LM_Control_AirTrickSpeed" Value = 0
 	AddOption name = "LM_Control_bXinput", value = 0
 	AddOption name = "LM_GUI_bShowHud" Value = 1
@@ -76,6 +78,8 @@ LM_Control_AirTrickSpeed_Text = [
 	"Normal Trick Speed"
 	"THPS4 Trick Speed"
 	"Fast Air Trick Speed"
+	"10 percent faster"
+	"20 percent faster"
 ]
 
 //a generic toggle func to take option, item id and on off text
@@ -282,7 +286,7 @@ levelmod_menu_control_items = [
 	//0 = normal
 	//1 = THPS4
 	//2 = Fast 1
-	{ Type = slidermenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" lower = 0 upper = 2 delta = 1 start = 0 wrap = 0 right_side_w = 80 eventhandlers = [ {Type = showeventhandler target = "LM_SetOption" id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text TextOnly}{ Type = ContentsChangedEventHandler target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text} } ] }
+	{ Type = slidermenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" lower = 0 upper = 4 delta = 1 start = 0 wrap = 0 right_side_w = 80 eventhandlers = [ {Type = showeventhandler target = "LM_SetOption" id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text TextOnly}{ Type = ContentsChangedEventHandler target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text} } ] }
 	
 	//enables XInput support, restart required for this option to apply
 	{ LM_Menu_Shared_Bool id = LM_Control_bXinput_id params = { name = LM_Control_bXinput id = LM_Control_bXinput_id on = "Xinput: on" off = "Xinput: off" } }
