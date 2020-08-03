@@ -22,7 +22,7 @@ EXTERN Hooked_Present pHookedPresent;*/
 
 
 
-float _GetCurrentTime()
+DWORD _GetCurrentTime()
 {
 	static const DWORD timer = 0x00409AE0;
 	_asm call timer
@@ -89,12 +89,21 @@ DWORD GetElementSliderValue(DWORD name)
 	_asm pushfd;
 	Element* container = AllocateElement(0);
 	Element* element = container->GetElement(name);
-	element = (Element*)CastPointer((void*)element, 0, 0x005B6344, 0x005B6638, FALSE);
-	DWORD value = element->GetValue();
+	if (element)
+	{
+		element = (Element*)CastPointer((void*)element, 0, 0x005B6344, 0x005B6638, FALSE);
+		DWORD value = element->GetValue();
+		FreeElement();
+
+		_asm popfd;
+		_asm popad;
+		return value;
+	}
 	FreeElement();
+
 	_asm popfd;
 	_asm popad;
-	return value;
+	return 0xFFFFFFFF;
 }
 
 

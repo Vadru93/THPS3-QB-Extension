@@ -36,7 +36,7 @@ struct EXTERN CArray
 		return  *(indices+x);
 	}
 
-	int GetNumItems();
+	int GetNumItems(bool trueCount = true);
 	void SetValues(CStructHeader* values);
 	inline float GetFloat(int Item)
 	{
@@ -70,12 +70,20 @@ struct EXTERN CArray
 		else return 0;
 	}
 
-	inline char* GetString(int Item)
+	DWORD GetSize();
+
+	char* GetString(int index)
+	{
+		_printf("ArrayType %d %p\n", Type, Items[index]);
+		return (char*)Items[index];
+	}
+
+	/*inline char* GetString(int Item)
 	{
 		if (Type == 0x0A || Type == 0x0B)
 			return (char*)((CStructHeader***)Items)[Item][0]->pData;
 		return ((char**)Items)[Item];
-	}
+	}*/
 
 	inline char* GetString(int Item, int Itm)
 	{
@@ -131,14 +139,22 @@ struct EXTERN CArray
 		return GetCStruct(Checksum(Name), Item, outItem);
 	}
 
-	CStructHeader* GetCStruct(DWORD index)
+	CStructHeader* GetCStruct(DWORD index, char* functionName =NULL)
 	{
+		if (Type != 0xA && Type != 0xB)
+		{
+			_printf("WARNING " __FUNCTION__ " Wrong array Type(%d)\n", Type);
+			_printf("Index %d(%d) %p in CArray %p\n CalledFrom %s\n", index, GetNumItems(), Items[index], this, functionName ? functionName : __FUNCTION__);
+			//index = 0;
+			//return (CStructHeader*)Items[index];
+		}
 		if (index >= 0xFFFF)
 		{
 			_printf("###WARNING INDEX TOO HIGH###\n");
+			_printf("Index %d(%d) %p in CArray %p\n CalledFrom %s\n", index, GetNumItems(), Items[index], this, functionName ? functionName : __FUNCTION__);
 			index = (NumItems - 1);
 		}
-		_printf("Index %d %p\n", index, Items[index]);
+		//
 		return *(CStructHeader**)Items[index];
 	}
 
@@ -174,6 +190,112 @@ struct Node
 	CStructHeader* GetNodeStruct()
 	{
 		return GetNodeArray()->GetCStruct(GetNodeIndex(name));
+	}
+
+	static void PrintNodeArrayInfo()
+	{
+		CArray* NodeArray = GetNodeArray();
+
+
+		DWORD numCStructs = 0, numInts = 0, intSize = 0, 
+			totalSize = 0, floatSize = 0, numFloats = 0, numArrays = 0, arraySize = 0, 
+			numPairs = 0, pairSize = 0, numStructs = 0, structSize = 0, numLocals = 0, localSize = 0, 
+			numStrings = 0, stringSize = 0, numCompiled = 0, compiledSize = 0, numScripts = 0, 
+			scriptSize = 0, numVec = 0, vectorSize = 0;
+		for (DWORD i = 0; i < NodeArray->GetNumItems(); i++)
+		{
+			CStructHeader* header = NodeArray->GetCStruct(i);
+
+			while (header)
+			{
+				numCStructs++;
+				switch (header->Type)
+				{
+				case QBKeyHeader::INT:
+					numInts++;
+					intSize += sizeof(CStructHeader);
+					totalSize += intSize;
+					break;
+				case QBKeyHeader::FLOAT:
+					floatSize += sizeof(CStructHeader);
+					totalSize += floatSize;
+					numFloats++;
+					break;
+				case QBKeyHeader::ARRAY:
+					numArrays++;
+					arraySize = sizeof(CStructHeader);
+					totalSize += arraySize;
+					break;
+
+				case QBKeyHeader::PAIR:
+					numPairs++;
+					pairSize += 8 + sizeof(QBKeyHeader);
+					totalSize += pairSize;
+					break;
+
+				case QBKeyHeader::LOCAL_STRUCT:
+				case QBKeyHeader::STRUCT:
+					numStructs++;
+					structSize += sizeof(CStructHeader);
+					totalSize += structSize;
+					break;
+
+				case QBKeyHeader::LOCAL:
+					numLocals++;
+					localSize += sizeof(CStructHeader);
+					totalSize += localSize;
+					break;
+
+				case QBKeyHeader::STRING:
+				case QBKeyHeader::LOCAL_STRING:
+					if (header->pStr && !InvalidReadPtr(header->pStr))
+					{
+						numStrings++;
+						stringSize += sizeof(CStructHeader) + strlen(header->pStr) + 1;
+						totalSize += stringSize;
+					}
+					break;
+
+				case QBKeyHeader::COMPILED_FUNCTION:
+					numCompiled++;
+					compiledSize += sizeof(CStructHeader);
+					totalSize += compiledSize;
+					break;
+
+
+				case QBKeyHeader::SCRIPTED_FUNCTION:
+					numScripts++;
+					scriptSize += sizeof(CStructHeader);
+					totalSize += scriptSize;
+					break;
+
+				case QBKeyHeader::VECTOR:
+					numVec++;
+					vectorSize += sizeof(CStructHeader) + 12;
+					totalSize += vectorSize;
+					break;
+
+				default:
+					totalSize += sizeof(CStructHeader);
+					break;
+				}
+				header = header->NextHeader;
+			}
+
+
+		}
+		_printf("---NodeArray---\n");
+		_printf("Numer of Nodes %d CStructs %d (MAX %d) size %X(Max %X)\n", NodeArray->GetNumItems(), numCStructs,  HASH_SIZE /12, numCStructs * 12, HASH_SIZE);
+		_printf("Number of ints %d with total size %X\n", numInts, intSize);
+		_printf("Number of floats %d with total size %X\n", numFloats, floatSize);
+		_printf("Number of arrays %d with total size %X\n", numArrays, arraySize);
+		_printf("Number of pairs %d with total size %X\n", numPairs, pairSize);
+		_printf("Number of structs %d with total size %X\n", numStructs, structSize);
+		_printf("Number of locals %d with total size %X\n", numLocals, localSize);
+		_printf("Number of strings %d with total size %X\n", numStrings, stringSize);
+		_printf("Number of CFuncs %d with total size %X\n", numCompiled, compiledSize);
+		_printf("Number of Scripts %d with total size %X\n", numScripts, scriptSize);
+		_printf("Number of Vectors %d with total size %X\n", numVec, vectorSize);
 	}
 
 	//Gets the CStructHeader of a node

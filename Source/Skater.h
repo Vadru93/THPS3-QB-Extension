@@ -104,12 +104,6 @@ private://0575a190
 //#pragma pop(pack)
 public:
 
-
-	bool Vibrate()
-	{
-		return bailOn;
-	}
-
 	bool IsHost()
 	{
 		return *(bool*)(this + 0x84CC);
@@ -172,6 +166,11 @@ public:
 	}
 
 
+	typedef float(__thiscall* const pGetScriptedStat)(Skater* pThis, char* name);
+	float GetScriptedStat(char* name)
+	{
+		return pGetScriptedStat(0x0049F670)(this, name);
+	}
 
 
 	typedef bool(__thiscall* const pCallMemberFunction)(Skater* pThis, DWORD checksum, CStruct* pStruct, CScript* pScript);

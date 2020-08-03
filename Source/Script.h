@@ -220,6 +220,15 @@ struct CStructHeader
 		//if Type is function this is the address of the function
 	};
 
+	//Unnamed int
+	CStructHeader(QBKeyHeader::QBKeyType Type, int value, CStructHeader* next = NULL)
+	{
+		this->Type = Type;
+		this->QBkey = 0;
+		this->value.i = value;
+		NextHeader = next;
+	}
+
 	
 	CStructHeader(QBKeyHeader::QBKeyType Type, DWORD checksum, void* data)
 	{
@@ -245,6 +254,8 @@ struct CStructHeader
 	{
 		return pScript;
 	}
+
+	EXTERN DWORD GetSize();
 
 	CArray* GetArray(DWORD checksum)
 	{
@@ -359,6 +370,27 @@ struct CStructHeader
 		return numItems;
 	}
 
+
+	bool SetFloat(DWORD checksum, float value)
+	{
+		_printf("SetFloat %p\n", this);
+		CStructHeader* header = this;
+		while (header)
+		{
+			if (header->QBkey == checksum)
+			{
+				header->value.f = value;
+				return true;
+			}
+			else if (header->Type == QBKeyHeader::STRUCT || header->Type == QBKeyHeader::LOCAL_STRUCT)
+			{
+				if ((*(CStructHeader**)header->pStruct)->SetFloat(checksum, value))
+					return true;
+			}
+			header = header->NextHeader;
+		}
+		return false;
+	}
 
 	//use this function to set multiply values in 1 function call
 	void SetValues(CStructHeader* values)
@@ -813,6 +845,11 @@ struct EXTERN CStruct
 		return false;
 		//return head->GetStruct(checksum, header);
 	}
+
+	/*CStructHeader* GotParam(DWORD name)
+	{
+
+	}*/
 
 	D3DXVECTOR3* GetVector(const char* param)
 	{

@@ -13,8 +13,8 @@ struct KeyState
 {
 private:
 	DWORD pressed;
-	float timepress;
-	float timerelease;
+	DWORD timepress;
+	DWORD timerelease;
 	DWORD holding;//0xFF
 	DWORD unk1[2];//1
 	DWORD checksum;
@@ -39,7 +39,7 @@ public:
 
 	
 	//the press is between 0x0-0xFF, press below or equal to 0x40 is deadzone
-	void Update(float time, DWORD press)
+	void Update(DWORD time, DWORD press)
 	{
 		_printf("press %X\nKeyState %p %s(%X)\n", press, this, FindChecksumName(this->checksum), this->checksum);
 		//the press is between 0x0-0xFF, press below or equal to 0x40 is deadzone
@@ -59,12 +59,12 @@ public:
 	}
 
 
-	float GetReleasedTime()
+	DWORD GetReleasedTime()
 	{
 		return timerelease;
 	}
 
-	float GetPressedTime()
+	DWORD GetPressedTime()
 	{
 		return timepress;
 	}
