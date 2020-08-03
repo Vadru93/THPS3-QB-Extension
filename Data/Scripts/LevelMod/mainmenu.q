@@ -481,6 +481,7 @@ script frontend_menu_on_show
   AddOption name = "LM_DebugOption_bDebugMode" Value = 0
   AddOption name = "LM_GUI_bTrickNotifications" Value = 1
   AddOption name = "LM_Control_bWalliePlant" Value = 1
+  AddOption name = "LM_Control_bExtraTricks" Value = 1
   InitLevelMod
 endscript
 
