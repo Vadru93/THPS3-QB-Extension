@@ -427,25 +427,14 @@ ExtraFS540ShoveIt = [ { EXTRA_FLIP Params = { Name = '540 FS Shove-It' Score = 1
 
 //===melon/method===
 
-
 TrickDef_Melon = { 
-	Name = 'Superman'
-	Score = 800 
-	Anim = RocketAir
-	Idle = KFSupermanGrab_Range 
-	OutAnim = KFSupermanGrab_Out 
-	Backwards
+	Name = 'Melon / Method' 
+	ShowName = 'Melon'
+	Score = 300 
+	Anim = MelonGrab 
+	Idle = MelonGrab_Idle 
 	ExtraTricks = ExtraMethod 
 }
-
-//TrickDef_Melon = { 
-//	Name = 'Melon / Method' 
-//	ShowName = 'Melon'
-//	Score = 300 
-//	Anim = MelonGrab 
-//	Idle = MelonGrab_Idle 
-//	ExtraTricks = ExtraMethod 
-//}
 
 ExtraMethod = [ { EXTRA_GRAB Params = { TrickDef_Method IsExtra } } ]
 
