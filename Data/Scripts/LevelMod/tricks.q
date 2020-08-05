@@ -94,6 +94,7 @@ Exceptions = [
 	AcidDrop
 	SpineTransfer
 	BankDrop
+	Wallplant
 ]
 
 SCRIPT OnGroundExceptions
@@ -151,6 +152,7 @@ SCRIPT InAirExceptions
 	SetException Ex = BankDrop Scr = BankDrop
 	SetException Ex = WallRideBail Scr = WallRideBail
 	SetException Ex = CarPlant Scr = CarPlant CallInsteadofGoto
+	SetException Ex = Wallplant Scr = Wallplant
 	SetException Ex = CarBail Scr = CarBail
 	SetException Ex = SkaterCollideBail Scr = SkaterCollideBail
 	SetException Ex = MadeOtherSkaterBail Scr = MadeOtherSkaterBailAir CallInsteadofGoto
@@ -239,6 +241,41 @@ SCRIPT BankDrop
 	KillExtraTricks
 	WaitAnimWhilstChecking
 	goto Airborne
+ENDSCRIPT
+
+SCRIPT WallplantOllie
+    IF WallplantTimeGreaterThan 200
+	    ClearException Ollied
+    ELSE
+	    #"Jump" 200
+		ClearException Ollied
+	ENDIF
+ENDSCRIPT
+
+SCRIPT Wallplant
+NoSpin
+ if BailIsOn
+    SetState Air
+  endif
+  NollieOff
+  InAirExceptions
+  ClearException Ollied
+  Vibrate Actuator = 1 Percent = 100 Duration = 0.1
+  PlayAnim Anim = Fastplant BlendPeriod = 0
+  SetTrickName 'Wallplant'
+  SetTrickScore 750
+  Display BlockSpin
+  begin
+    IF WallplantTimeGreaterThan 100
+	    SetException Ex = Ollied  Scr = WallplantOllie CallInsteadofGoto
+		break
+	ENDIF
+	DoNextTrick
+	WaitOneGameFrame
+  repeat
+  CanSpin
+  WaitAnimWhilstChecking
+  goto Airborne
 ENDSCRIPT
 
 SCRIPT WallRide
