@@ -244,36 +244,67 @@ SCRIPT BankDrop
 ENDSCRIPT
 
 SCRIPT WallplantOllie
-    IF WallplantTimeGreaterThan 200
+    IF WallplantTimeGreaterThan 350
 	    ClearException Ollied
     ELSE
-	    #"Jump" 200
+	    Ollie
 		ClearException Ollied
 	ENDIF
 ENDSCRIPT
 
+WallplantOllie2 =
+[
+  { Trigger = { Tap , x , 200 } Scr = Ollie Params = { JumpSpeed = 200 } }
+]
+
+WALLPLANT_WINDOW = 450
+Wallplant_Trick =
+[
+  { InOrder , x , Down , WALLPLANT_WINDOW }
+  { InOrder , x , DownLeft , WALLPLANT_WINDOW }
+  { InOrder , x , DownRight , WALLPLANT_WINDOW }
+  { InOrder , Down , x , WALLPLANT_WINDOW }
+  { InOrder , DownLeft , x , WALLPLANT_WINDOW }
+  { InOrder , DownRight , x , WALLPLANT_WINDOW }
+]
+
 SCRIPT Wallplant
-NoSpin
- if BailIsOn
+
+  IF BailIsOn
     SetState Air
-  endif
+  ENDIF
   NollieOff
   InAirExceptions
   ClearException Ollied
+  NoSpin
   Vibrate Actuator = 1 Percent = 100 Duration = 0.1
-  PlayAnim Anim = Fastplant BlendPeriod = 0
+  PlayAnim Anim = Beanplant BlendPeriod = 0
   SetTrickName 'Wallplant'
   SetTrickScore 750
   Display BlockSpin
+  NoSpin
   begin
-    IF WallplantTimeGreaterThan 100
-	    SetException Ex = Ollied  Scr = WallplantOllie CallInsteadofGoto
+    IF WallplantTimeGreaterThan 180
+	    ClearEventBuffer Buttons = [ x ]
+	    SetException ex = Ollied scr = WallplantOllie CallInsteadofGoto
+		//SetQueueTricks Wallplantollie2
+		printf "Allowing ollie"
+		CanSpin
 		break
 	ENDIF
 	DoNextTrick
 	WaitOneGameFrame
   repeat
-  CanSpin
+  
+  begin
+    IF WallplantTimeGreaterThan 400
+		printf "Disallowing ollie"
+		break
+	ENDIF
+	DoNextTrick
+	WaitOneGameFrame
+  repeat
+  ClearTrickQueue
   WaitAnimWhilstChecking
   goto Airborne
 ENDSCRIPT
