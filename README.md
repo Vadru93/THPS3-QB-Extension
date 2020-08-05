@@ -22,15 +22,15 @@ Also Skate3.exe is no longer needed, because d3d8.dll is loaded earlier so I cha
 * **SomeNotes** When you call a function that will add a value to your params that you can access with GLOBAL
 * You need to have the value there in the params else it will not work
 * **ChangeString** Example: `ChangeString string = StringToChange param = TherNewString` always returns true
-*	**strstr** Example: `strstr s1 = "Here is a string" s2 = "string"` returns true if s1 contains s2
-*	**GetZAngle** angle is stored in `GLOBAL.angle` and `GLOBAL.angle` need to exist before calling **GetZAngle** always returns true
-*	**GetSpeed** same as above but stored in `GLOBAL.speed` always returns true
+* **strstr** Example: `strstr s1 = "Here is a string" s2 = "string"` returns true if s1 contains s2
+* **GetZAngle** angle is stored in `GLOBAL.angle` and `GLOBAL.angle` need to exist before calling **GetZAngle** always returns true
+* **GetSpeed** same as above but stored in `GLOBAL.speed` always returns true
 * **GetSkaterPos** same as above but stored in `GLOBAL.pos` always returns true
 * **GetSkaterLook** same as above but stored in `GLOBAL.pos` always returns true
 * **CreatePair** Example: `CreatePair Name = "NameToStore" x = 1.0 y = 2.0` acces it with `GLOBAL.NameToStore`
 * **TestForAcid** depricated
-*	**Wallplant** This is an unfinished wallplant script always returns true
-* **PreWallplant** Related to unfinished wallplant always returns true
+* **Wallplant** depricated
+* **PreWallplant** depricated
 * **EnterObserveMode2** Enter custom observe mode always returns true
 * **LeaveObserveMode2** Leave custom observe mode always returns true
 * **ObserveNext** Observe next player always returns true
@@ -51,8 +51,8 @@ Also Skate3.exe is no longer needed, because d3d8.dll is loaded earlier so I cha
 * **MoveObject** Move an EnvironmentObject
 * **KillMovingObject** Stop Moving an EnvironmentObject
 * **ChangeParamToUnnamed**
-* **IsOptionOn**
-* **AddOption**
-* **ToggleOption**
-* **LM_GotParam**
-* **GetParam**
+* **IsOptionOn** check if an option is on, remember to add the option to the list first
+* **AddOption** adds an option to the list, all options gets stored inside levelmod.ini use value = [number] to set a default value
+* **ToggleOption** toggle an option
+* **LM_GotParam** usage same as GotParam, but checks inside arrays and structs
+* **GetParam** Moves a param from array/struct into the local stack
