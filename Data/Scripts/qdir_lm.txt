@@ -22,6 +22,7 @@ LevelMod\tricks.qb
 LevelMod\bird_c.qb
 LevelMod\bird_c_resting.qb
 LevelMod\settings.qb
+LevelMod\skater_sfx.qb
 
 ajc_scripts.qb
 alf_scripts.qb
@@ -217,7 +218,6 @@ skater_m_lip.qb
 skater_m_misc.qb
 skater_m_special.qb
 skater_profile.qb
-skater_sfx.qb
 skutils.qb
 soundtest.qb
 statsmenu.qb
