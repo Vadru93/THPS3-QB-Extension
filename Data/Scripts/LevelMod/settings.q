@@ -16,18 +16,18 @@ SCRIPT CreateLevelModMenus
 	CreateMenu { LevelMod_menu_GameOptions }
 	AttachChild parent = contain1 child = menu_levelmod_GameOptions
 	
-	
-		
-	CreateMenu { Type = verticalmenu id = spine_button_menu x = 170.0 y = 90.0 w = 300.0 h = 400.0 just_center_x just_center_y blue_top children = [ { Type = textmenuelement auto_id text = "Spine Button" static dont_gray drawer = title }
-			{ Type = textmenuelement auto_id text = "Revert" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 0 TextFromValue = LM_Control_SpineButton_Text } }
-			{ Type = textmenuelement auto_id text = "Nollie" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 1 TextFromValue = LM_Control_SpineButton_Text } }
-			{ Type = textmenuelement auto_id text = "Left Spin Button" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 2 TextFromValue = LM_Control_SpineButton_Text } }
-			{ Type = textmenuelement auto_id text = "Right Spin Button" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 3 TextFromValue = LM_Control_SpineButton_Text } } 
-			{ Type = textmenuelement auto_id text = "Revert + Nollie" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 4 TextFromValue = LM_Control_SpineButton_Text } } 
-			{ Type = textmenuelement auto_id text = "Both Spin Buttons" target = "LM_SetOption" link = menu_levelmod_control Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 5 TextFromValue = LM_Control_SpineButton_Text } } ] }
-	attachchild parent = contain1 child = spine_button_menu
-	
+	//adds levelmod menu
+	CreateMenu { LevelMod_menu_air }
+	AttachChild parent = contain1 child = menu_levelmod_air
 
+	CreateMenu { Type = verticalmenu id = spine_button_menu x = 170.0 y = 90.0 w = 300.0 h = 400.0 just_center_x just_center_y blue_top children = [ { Type = textmenuelement auto_id text = "Spine Button" static dont_gray drawer = title }
+			{ Type = textmenuelement auto_id text = "Revert" target = "LM_SetOption" link = menu_levelmod_air Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 0 TextFromValue = LM_Control_SpineButton_Text } }
+			{ Type = textmenuelement auto_id text = "Nollie" target = "LM_SetOption" link = menu_levelmod_air Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 1 TextFromValue = LM_Control_SpineButton_Text } }
+			{ Type = textmenuelement auto_id text = "Left Spin Button" target = "LM_SetOption" link = menu_levelmod_air Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 2 TextFromValue = LM_Control_SpineButton_Text } }
+			{ Type = textmenuelement auto_id text = "Right Spin Button" target = "LM_SetOption" link = menu_levelmod_air Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 3 TextFromValue = LM_Control_SpineButton_Text } } 
+			{ Type = textmenuelement auto_id text = "Revert + Nollie" target = "LM_SetOption" link = menu_levelmod_air Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 4 TextFromValue = LM_Control_SpineButton_Text } } 
+			{ Type = textmenuelement auto_id text = "Both Spin Buttons" target = "LM_SetOption" link = menu_levelmod_air Params = { id = SpineButtonText_id name = LM_Control_SpineButton Value = 5 TextFromValue = LM_Control_SpineButton_Text } } ] }
+	AttachChild parent = contain1 child = spine_button_menu
 ENDSCRIPT
 
 SCRIPT AddOptions
@@ -57,11 +57,13 @@ SCRIPT AddOptions
 	AddOption name = "LM_BugFix_bSoundFix" Value = 1
 	AddOption name = "LM_GameOption_bLimitTags" Value = 0
 	AddOption name = "LM_GameOption_bGrass" Value = 1
+	AddOption name = "LM_GameOption_bNetSky" Value = 0
 	AddOption name = "LM_DebugOption_bDebugMode" Value = 0
 	AddOption name = "LM_GUI_bTrickNotifications" Value = 1
 	AddOption name = "LM_Control_bWalliePlant" Value = 1
 	AddOption name = "LM_Control_bButtSlap" value = 1
 	AddOption name = "LM_Control_bBoostPlant" value = 0
+	AddOption name = "LM_Control_bWallplant" value = 1
 ENDSCRIPT
  
 SCRIPT LM_SetOption
@@ -173,6 +175,20 @@ SCRIPT LM_ToggleOption
 				printf "without menu id!"
 			ENDIF
 		ENDIF
+		IF GotParam LinkedTo
+		    IF #"Not" IsOptionOn <LinkedTo>
+		        DestroyElement id = <id>
+			ENDIF
+		ELSE
+		    IF LM_GotParam LinkedTo_id
+		        GetParam LinkedTo
+				IF GotParam Name
+		            IF #"Not" IsOptionOn <name>
+			            DestroyElement id = <LinkedTo_id>
+			        ENDIF
+				ENDIF
+		    ENDIF
+		ENDIF
 	ENDIF
 ENDSCRIPT
 
@@ -217,6 +233,20 @@ LevelMod_menu_control = {
 		Type = showeventhandler 
 		target = "UpdateMenuText" 
 		params = LevelMod_menu_control
+	}
+}
+
+//Control->Air menu struct
+LevelMod_menu_air = { 
+	Type = verticalmenu
+	id = menu_levelmod_air
+	children = levelmod_menu_air_items
+	x = 170.0 y = 90.0 w = 300.0 h = 400.0 
+	just_center_x just_center_y blue_top 
+	eventhandler = { 
+		Type = showeventhandler 
+		target = "UpdateMenuText" 
+		params = LevelMod_menu_air
 	}
 }
 
@@ -277,6 +307,9 @@ levelmod_menu_GameOptions_items = [
 	//enables pseudo 3d layered grass in t2x and th4 levels
 	{ LM_Menu_Shared_Bool id = LM_GameOption_bGrass_id params = { name = LM_GameOption_bGrass id = LM_GameOption_bGrass_id on = "3D Grass: on" off = "3D Grass: off" } }
 	
+	//enables pseudo 3d layered grass in t2x and th4 levels
+	{ LM_Menu_Shared_Bool id = LM_GameOption_bNetSky_id params = { name = LM_GameOption_bNetSky id = LM_GameOption_bNetSky_id on = "Net sky: on" off = "Net sky: off" } }
+	
 	//enables debug console, restart required for this option to apply
 	{ LM_Menu_Shared_Bool id = LM_DebugOption_bDebugMode_id params = { name = LM_DebugOption_bDebugMode id = LM_DebugOption_bDebugMode_id on = "Debug Mode: on" off = "Debug Mode: off" } }
 	
@@ -303,18 +336,21 @@ levelmod_menu_GUI_items = [
 	{ LM_Menu_Shared_Back Params = { id = menu_levelmod_GUI } } 
 ]
 
-levelmod_menu_control_items = [ 
-	{ Type = textmenuelement auto_id text = "Control Options" static dont_gray drawer = title }
-	//option to disable revert chain
-	{ LM_Menu_Shared_Bool id = LM_Control_bRevert_id params = { name = LM_Control_bRevert id = LM_Control_bRevert_id on = "Reverts: on" off = "Reverts: off" } }
-	
-	//option to disable wallieplant chain
-	{ LM_Menu_Shared_Bool id = LM_Control_bWalliePlant_id params = { name = LM_Control_bWalliePlant id = LM_Control_bWalliePlant_id on = "Wallieplant: on" off = "Wallieplant: off" } }
+levelmod_menu_air_items = [
+{ Type = textmenuelement auto_id text = "Air" static dont_gray drawer = title }
+    //option to disable wallieplant chain
+	{ LM_Menu_Shared_Bool id = LM_Control_bWalliePlant_id params = { name = LM_Control_bWalliePlant id = LM_Control_bWalliePlant_id on = "Wallieplant: on" off = "Wallieplant: off" LinkedTo_id = LM_Control_bBoostPlant_id } }
 	//option to disable wallieplant boostplant
-	{ LM_Menu_Shared_Bool id = LM_Control_bBoostPlant_id params = { name = LM_Control_bBoostPlant id = LM_Control_bBoostPlant_id on = "Boostplant: on" off = "Boostplant: off" } }
+	{ LM_Menu_Shared_Bool id = LM_Control_bBoostPlant_id LinkedTo = LM_Control_bWalliePlant params = { name = LM_Control_bBoostPlant id = LM_Control_bBoostPlant_id on = "Boostplant: on" off = "Boostplant: off" } }
+	
+	//option to disable walllplant
+	{ LM_Menu_Shared_Bool id = LM_Control_bWallPlant_id params = { name = LM_Control_bWallPlant id = LM_Control_bWallPlant_id on = "Wallplant: on" off = "Wallplant: off" } }
 	
 	//option to disable buttslap
     { LM_Menu_Shared_Bool id = LM_Control_bButtSlap_id params = { name = LM_Control_bButtSlap id = LM_Control_bButtSlap_id on = "Buttslap: on" off = "Buttslap: off" } }
+	
+	//new tricks?
+	{ LM_Menu_Shared_Bool id = LM_Control_bExtraTricks_id params = { name = LM_Control_bExtraTricks id = LM_Control_bExtraTricks_id on = "Extra tricks: on" off = "Extra tricks: off" } }
 	
 	//Sets spine button
 	//0 = Revert
@@ -325,9 +361,6 @@ levelmod_menu_control_items = [
 	//5 = SpinLeft+SpinRight
 	{ Type = textmenuelement id = LM_Control_SpineButton_id text = "Spine Button" link = spine_button_menu params = { name = LM_Control_SpineButton id = LM_Control_SpineButton_id } }	
 	{ Type = textmenuelement id = SpineButtonText_id text = "Foo" static dont_gray drawer = keyboard_property params = { id = SpineButtonText_id TextFromValue = LM_Control_SpineButton_Text name = LM_Control_SpineButton } }
-	
-	//new tricks?
-	{ LM_Menu_Shared_Bool id = LM_Control_bExtraTricks_id params = { name = LM_Control_bExtraTricks id = LM_Control_bExtraTricks_id on = "Extra tricks: on" off = "Extra tricks: off" } }
 	{ LM_Menu_Shared_Bool id = LM_Control_bSpine_id params = { name = LM_Control_bSpine id = LM_Control_bSpine_id on = "Spine Transfer: on" off = "Spine Transfer: off" } }
 	{ LM_Menu_Shared_Bool id = LM_Control_bAcid_id params = { name = LM_Control_bAcid id = LM_Control_bAcid_id on = "Acid Drop: on" off = "Acid Drop: off" } }
 	{ LM_Menu_Shared_Bool id = LM_Control_bBank_id params = { name = LM_Control_bBank id = LM_Control_bBank_id on = "Bank Drop: on" off = "Bank Drop: off" } }
@@ -338,6 +371,16 @@ levelmod_menu_control_items = [
 	//2 = Fast 1
 	{ Type = slidermenuelement id = LM_Control_AirTrickSpeed_id text = "Foo" lower = 0 upper = 4 delta = 1 start = 0 wrap = 0 right_side_w = 80 eventhandlers = [ {Type = showeventhandler target = "LM_SetOption" params = { id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text TextOnly } }{ Type = ContentsChangedEventHandler target = "LM_SetOption" params = { name = LM_Control_AirTrickSpeed id = LM_Control_AirTrickSpeed_id TextFromValue = LM_Control_AirTrickSpeed_Text} } ] }
 	
+	//goes back to previous menu
+	{ LM_Menu_Shared_Back Params = { id = menu_levelmod_air } } 
+]
+
+levelmod_menu_control_items = [ 
+	{ Type = textmenuelement auto_id text = "Control Options" static dont_gray drawer = title }
+	//Link to air options
+	{ Type = textmenuelement auto_id text = "Air" link = menu_levelmod_air }	
+	//option to disable revert chain
+	{ LM_Menu_Shared_Bool id = LM_Control_bRevert_id params = { name = LM_Control_bRevert id = LM_Control_bRevert_id on = "Reverts: on" off = "Reverts: off" } }
 	//enables XInput support, restart required for this option to apply
 	{ LM_Menu_Shared_Bool id = LM_Control_bXinput_id params = { name = LM_Control_bXinput id = LM_Control_bXinput_id on = "Xinput: on" off = "Xinput: off" } }
 
