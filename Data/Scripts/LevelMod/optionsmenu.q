@@ -410,7 +410,8 @@ SCRIPT WaitForButtonRelease
 			BREAK
 		ENDIF
 		Wait 1 gameframe
-	REPEAT ENDSCRIPT
+	REPEAT
+ENDSCRIPT
 
 SCRIPT Options_RecordsDisplay
 	DisableBackEvent
@@ -461,7 +462,8 @@ SCRIPT Skater_RecordsDisplay level = LevelNum_Foundry Heading = "Foundry"
 			BREAK
 		ENDIF
 		Wait 1 gameframe
-	REPEAT ENDSCRIPT
+	REPEAT
+ENDSCRIPT
 
 SCRIPT MaybeShowShip
 	Goto Skater_RecordsDisplay Params = { level = LevelNum_Ship Heading = "Ship" }
