@@ -676,7 +676,10 @@ SCRIPT Load_Level_Func
 	ELSE
 		SetClippingDistances { near = <cnear> far = <cfar> }
 	ENDIF
-	
+
+	//this should be uncommented when all def structs are fixed
+	//LM_MaybeSetTh2Physics <...>
+
 	IF GotParam startup_func
 		<startup_func>
 	ENDIF
@@ -684,6 +687,34 @@ SCRIPT Load_Level_Func
 	printf "...finshed loading."
 ENDSCRIPT
 
+DEFAULT_WALL_SKATABLE_ANGLE = 25
+LM_TH2_PHYSICS = 0
+
+SCRIPT LM_MaybeSetTh2Physics
+	//reset to default angle
+	Change Wall_Non_Skatable_Angle = DEFAULT_WALL_SKATABLE_ANGLE
+	Change LM_TH2_PHYSICS = 0
+	
+	if GotParam th1_level
+		Change LM_TH2_PHYSICS = 1
+	endif
+	
+	if GotParam th2_level
+		Change LM_TH2_PHYSICS = 1
+	endif
+	
+	if GotParam th2x_level
+		Change LM_TH2_PHYSICS = 1
+	endif
+	
+	if IsTrue LM_TH2_PHYSICS
+		//this is here for th1 levels in th3 (warehouse, burnside, roswell)
+		if #"not" GotParam ignore_th2_wall
+			printf "need to fix angle!"
+			Change Wall_Non_Skatable_Angle = 0
+		endif
+	endif
+ENDSCRIPT
 
 SCRIPT PrepareLevelFog r = 128 b = 128 b = 128 a = 128 cnear = 12 cfar = 10000
 	IF ClipPlaneEnabled
@@ -715,7 +746,7 @@ Def_Ware = {
 	
 	load_script = Load_Ware 
 
-	regular_level NoCareer th1_level OnlineModes
+	ignore_th2_wall regular_level NoCareer th1_level OnlineModes
 	
 	lev_bsp = "levels\ware\ware.bsp"
 	lev_qb = "levels\ware\ware.qb"
@@ -1025,9 +1056,9 @@ master_level_list = [
 	{ level_name = "Skate Park Chicago" load_script = Load_Vans level_id = vans_id NoCareer th1_level regular_level supports_ctf supports_own supports_bball }
 	{ level_name = "Downtown" load_script = Load_Down level_id = down_id NoCareer th1_level regular_level supports_ctf supports_own supports_bball }
 	{ level_name = "Downhill Jam" load_script = Load_Jam level_id = jam_id NoCareer th1_level regular_level supports_ctf supports_own supports_bball }
-	{ level_name = "Burnside" load_script = Load_Burn level_id = burnside_id regular_level NoCareer th1_level unlock_flag = LEVEL_UNLOCKED_BURNSIDE supports_ctf supports_own supports_bball }
+	{ level_name = "Burnside" load_script = Load_Burn level_id = burnside_id ignore_th2_wall regular_level NoCareer th1_level unlock_flag = LEVEL_UNLOCKED_BURNSIDE supports_ctf supports_own supports_bball }
 	{ level_name = "Streets" load_script = Load_SF1 level_id = streets_id NoCareer th1_level regular_level supports_ctf supports_own supports_bball }
-	{ level_name = "Roswell" load_script = Load_Ros level_id = roswell_id NoCareer unlock_flag = LEVEL_UNLOCKED_ROSWELL regular_level th1_level supports_ctf supports_own supports_bball }
+	{ level_name = "Roswell" load_script = Load_Ros level_id = roswell_id NoCareer ignore_th2_wall unlock_flag = LEVEL_UNLOCKED_ROSWELL regular_level th1_level supports_ctf supports_own supports_bball }
 	
 	//THPS2
 	{ Def_Han }
