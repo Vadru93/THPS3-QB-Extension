@@ -1,3 +1,6 @@
+# THIS IS NO LONGER UPDATED
+Check out full source and latest updates on https://github.com/Vadru93/LevelMod
+
 # THPS3-QB-Extension
 
 
